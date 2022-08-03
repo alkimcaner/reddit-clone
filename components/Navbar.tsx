@@ -10,7 +10,7 @@ import { BsChatDots } from "react-icons/bs";
 
 const Navbar = () => {
   return (
-    <nav className="sticky h-12 bg-neutral-900 text-white flex gap-4 items-center px-4">
+    <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-white flex gap-4 items-center px-4 border-b border-neutral-700">
       {/* Home */}
       <Link href="/">
         <div className="flex gap-2 items-center cursor-pointer">

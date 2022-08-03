@@ -2,6 +2,7 @@ import type { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
 import Navbar from "../components/Navbar";
+import Post from "../components/Post";
 
 const Home: NextPage = () => {
   return (
@@ -14,8 +15,29 @@ const Home: NextPage = () => {
 
       <Navbar />
 
-      <main className="">
-        <h1>Reddit clone</h1>
+      <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
+        <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
+          <Post />
+          <Post />
+          <Post />
+          <Post />
+          <Post />
+          <Post />
+          <Post />
+        </div>
+        <div className="hidden lg:flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-60 p-2">
+          <h2 className="font-semibold">Home</h2>
+          <p>
+            Your personal Reddit frontpage. Come here to check in with your
+            favorite communities.
+          </p>
+          <button className="bg-white bg-opacity-80 hover:bg-opacity-70 text-neutral-900 font-bold rounded-full py-1">
+            Create post
+          </button>
+          <button className="bg-white bg-opacity-0 hover:bg-opacity-5 border font-bold rounded-full py-1">
+            Create community
+          </button>
+        </div>
       </main>
     </div>
   );
