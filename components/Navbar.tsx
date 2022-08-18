@@ -1,4 +1,5 @@
 import React from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import redditLogo from "../assets/redditLogo.png";
@@ -7,8 +8,11 @@ import { AiFillHome, AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { BsChatDots } from "react-icons/bs";
+import { BiLogOut } from "react-icons/bi";
 
 const Navbar = () => {
+  const { data: session } = useSession();
+
   return (
     <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-white flex gap-4 items-center px-4 border-b border-neutral-700">
       {/* Home */}
@@ -29,7 +33,7 @@ const Navbar = () => {
         <MdKeyboardArrowDown className="md:ml-32" />
       </div>
       {/* Search */}
-      <div className="px-4 py-1 hidden md:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 mx-auto flex-1">
+      <div className="px-4 py-1 hidden md:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 mx-auto w-[32rem]">
         <AiOutlineSearch className="text-2xl" />
         <input
           className="bg-transparent outline-none text-white text-sm w-full"
@@ -49,21 +53,33 @@ const Navbar = () => {
         </div>
       </div>
       {/* Profile */}
-      <div className="flex gap-2 items-center px-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none">
-        <div className=" w-8 h-8 relative rounded-full overflow-hidden">
-          <Image
-            src={"https://avatars.githubusercontent.com/u/17219339?v=4"}
-            alt=""
-            layout="fill"
-            objectFit="cover"
-          />
+      {session ? (
+        <div
+          onClick={() => signOut()}
+          className="flex gap-2 items-center px-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none"
+        >
+          <div className=" w-8 h-8 relative rounded-full overflow-hidden">
+            <Image
+              src={session?.user?.image || redditLogo}
+              alt=""
+              layout="fill"
+              objectFit="cover"
+            />
+          </div>
+          <div className="hidden md:block min-w-max">
+            <p className="text-sm">{session?.user?.name}</p>
+            <p className="text-xs text-neutral-400">999 karma</p>
+          </div>
+          <BiLogOut className="text-neutral-400 text-xl md:ml-4" />
         </div>
-        <div className="hidden md:block">
-          <p className="text-sm">flawn</p>
-          <p className="text-xs text-neutral-400">999 karma</p>
+      ) : (
+        <div
+          onClick={() => signIn()}
+          className="flex gap-2 items-center px-8 py-1 rounded-full ring-blue-700 ring-1 cursor-pointer select-none hover:bg-blue-700"
+        >
+          <p>Log In</p>
         </div>
-        <MdKeyboardArrowDown className="md:ml-16" />
-      </div>
+      )}
     </nav>
   );
 };

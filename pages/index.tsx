@@ -1,6 +1,5 @@
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
 
@@ -17,13 +16,24 @@ const Home: NextPage = () => {
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          <Post />
-          <Post />
-          <Post />
-          <Post />
-          <Post />
-          <Post />
-          <Post />
+          <Post
+            subreddit="react"
+            username="flawn"
+            title="test"
+            content="test"
+            comments={[{ asd: 23 }]}
+            vote={42}
+            createdAt={Date.now()}
+          />
+          <Post
+            subreddit="javascript"
+            username="flawn"
+            title="test2"
+            content="test2"
+            comments={[{ asd: 23 }]}
+            vote={20}
+            createdAt={Date.now()}
+          />
         </div>
         <div className="hidden lg:flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-60 p-2">
           <h2 className="font-semibold">Home</h2>
