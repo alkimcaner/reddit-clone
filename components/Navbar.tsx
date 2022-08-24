@@ -14,26 +14,26 @@ const Navbar = () => {
   const { data: session } = useSession();
 
   return (
-    <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-white flex gap-4 items-center px-4 border-b border-neutral-700">
+    <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-neutral-300 flex gap-4 items-center px-4 border-b border-neutral-700">
       {/* Home */}
       <Link href="/">
         <div className="flex gap-2 items-center cursor-pointer">
           <div className="h-8 w-8 relative">
             <Image src={redditLogo} alt="" layout="fill" />
           </div>
-          <div className="h-4 w-14 relative hidden md:inline">
+          <div className="h-4 w-[3.25rem] relative hidden md:inline">
             <Image src={redditLogoText} alt="" layout="fill" />
           </div>
         </div>
       </Link>
       {/* Communities */}
-      <div className="flex gap-2 items-center p-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none">
+      <div className="mr-auto md:mr-0 flex gap-2 items-center p-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none">
         <AiFillHome className="text-2xl" />
         <span className="text-sm hidden md:inline">Home</span>
         <MdKeyboardArrowDown className="md:ml-32" />
       </div>
       {/* Search */}
-      <div className="px-4 py-1 hidden md:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 mx-auto w-[32rem]">
+      <div className="mr-auto px-4 py-1 hidden md:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 w-[48rem]">
         <AiOutlineSearch className="text-2xl" />
         <input
           className="bg-transparent outline-none text-white text-sm w-full"
@@ -41,24 +41,28 @@ const Navbar = () => {
         />
       </div>
       {/* Menu */}
-      <div className="ml-auto flex gap-1 items-center text-xl">
-        <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-          <BsChatDots />
+      {session && (
+        <div className="flex gap-1 items-center text-xl">
+          <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
+            <BsChatDots />
+          </div>
+          <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
+            <IoNotificationsOutline />
+          </div>
+          <Link href="create">
+            <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
+              <AiOutlinePlus />
+            </div>
+          </Link>
         </div>
-        <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-          <IoNotificationsOutline />
-        </div>
-        <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-          <AiOutlinePlus />
-        </div>
-      </div>
+      )}
       {/* Profile */}
       {session ? (
         <div
           onClick={() => signOut()}
-          className="flex gap-2 items-center px-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none"
+          className="min-w-max flex gap-2 items-center px-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none"
         >
-          <div className=" w-8 h-8 relative rounded-full overflow-hidden">
+          <div className="w-8 h-8 relative rounded-full overflow-hidden">
             <Image
               src={session?.user?.image || redditLogo}
               alt=""
@@ -75,7 +79,7 @@ const Navbar = () => {
       ) : (
         <div
           onClick={() => signIn()}
-          className="flex gap-2 items-center px-8 py-1 rounded-full ring-blue-700 ring-1 cursor-pointer select-none hover:bg-blue-700"
+          className="min-w-max flex gap-2 items-center px-8 py-1 rounded-full ring-blue-700 ring-1 cursor-pointer select-none hover:bg-blue-700"
         >
           <p>Log In</p>
         </div>
