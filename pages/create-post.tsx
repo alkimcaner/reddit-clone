@@ -43,12 +43,13 @@ const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
 
   const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (!titleRef.current?.value || !textRef.current?.value || !community) {
-      alert("Please fill in the blanks");
-      return;
-    }
     if (!session) {
       alert("Please log in");
+      return;
+    }
+
+    if (!titleRef.current?.value || !textRef.current?.value || !community) {
+      alert("Please fill in the blanks");
       return;
     }
 

@@ -14,12 +14,14 @@ const CreateCommunity: NextPage = () => {
 
   const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (!textRef.current?.value) {
-      alert("Please enter a community name");
-      return;
-    }
+
     if (!session) {
       alert("Please log in");
+      return;
+    }
+
+    if (!textRef.current?.value) {
+      alert("Please enter a community name");
       return;
     }
 
@@ -49,7 +51,8 @@ const CreateCommunity: NextPage = () => {
             </h1>
 
             <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
-              <div className="border border-neutral-700 rounded-md w-full">
+              <div className="border border-neutral-700 rounded-md w-full flex items-center gap-2">
+                <p className="ml-2">r/</p>
                 <input
                   ref={textRef}
                   type="text"
