@@ -3,7 +3,7 @@ import { GoArrowUp, GoArrowDown, GoComment } from "react-icons/go";
 import { IoMdShareAlt } from "react-icons/io";
 import { BsBookmark } from "react-icons/bs";
 import TimeAgo from "react-timeago";
-import { PostType } from "../pages/index";
+import { PostType } from "../types/PostType";
 
 const Post = ({ post }: { post: PostType }) => {
   return (

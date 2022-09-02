@@ -1,41 +1,26 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Link from "next/link";
 import { useEffect, useState } from "react";
+import CreateBox from "../components/CreateBox";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
-
-export interface PostType {
-  _id: string;
-  subreddit: string;
-  username: string;
-  title: string;
-  content: string;
-  comments: {
-    _id: string;
-    username: string;
-    content: string;
-    vote: number;
-    createdAt: number;
-  }[];
-  vote: number;
-  createdAt: number;
-}
+import { PostType } from "../types/PostType";
 
 export const getServerSideProps = async () => {
   try {
     const response = await axios.get(process.env.NEXTAUTH_URL + "api/getPosts");
+    const data: PostType[] = response.data;
     return {
-      props: { data: response.data },
+      props: { data },
     };
   } catch (error) {
     console.log(error);
   }
 };
 
-const Home: NextPage = ({ data }: any) => {
-  const [posts, setPosts] = useState<PostType[]>();
+const Home: NextPage<{ data: PostType[] }> = ({ data }) => {
+  const [posts, setPosts] = useState<PostType[]>([]);
 
   useEffect(() => {
     setPosts(data);
@@ -53,23 +38,11 @@ const Home: NextPage = ({ data }: any) => {
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {posts && posts.map((post) => <Post key={post._id} post={post} />)}
+          {posts.map((post) => (
+            <Post key={post._id} post={post} />
+          ))}
         </div>
-        <div className="hidden lg:flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-60 p-2">
-          <h2 className="font-semibold">Home</h2>
-          <p>
-            Your personal Reddit frontpage. Come here to check in with your
-            favorite communities.
-          </p>
-          <Link href="create">
-            <button className="bg-white bg-opacity-80 hover:bg-opacity-70 text-neutral-900 font-bold rounded-full py-1">
-              Create post
-            </button>
-          </Link>
-          <button className="bg-white bg-opacity-0 hover:bg-opacity-5 border font-bold rounded-full py-1">
-            Create community
-          </button>
-        </div>
+        <CreateBox />
       </main>
     </div>
   );

@@ -1,40 +1,71 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useEffect, useRef, useState } from "react";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { NextPage } from "next";
-import Link from "next/link";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from "next/router";
-import { compileFunction } from "vm";
+import { useClickOutside } from "../hooks/useClickOutside";
+import axios from "axios";
+import { useSession } from "next-auth/react";
+import CreateBox from "../components/CreateBox";
+import { CommunityType } from "../types/CommunityType";
 
-const CreatePost: NextPage = () => {
-  const [isChooseCommunityOpen, setIsChooseCommunitiesOpen] = useState(false);
-  const [communities, setCommunities] = useState<string[]>([
-    "r/javascript",
-    "r/react",
-    "r/nextjs",
-  ]);
+export const getServerSideProps = async () => {
+  try {
+    const response = await axios.get(
+      process.env.NEXTAUTH_URL + "api/getCommunities"
+    );
+    const communities = response.data;
+    return {
+      props: { data: { communities } },
+    };
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
+  data,
+}) => {
+  const router = useRouter();
+  const { data: session } = useSession();
+  const [isCommunitiesOpen, setIsCommunitiesOpen] = useState(false);
+  const [communities, setCommunities] = useState<CommunityType[]>([]);
   const [community, setCommunity] = useState<string>();
   const titleRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  const menuRef = useClickOutside(() => setIsCommunitiesOpen(false));
 
   const handleChooseCommunity = (community: string) => {
-    setIsChooseCommunitiesOpen(false);
     setCommunity(community);
+    setIsCommunitiesOpen(false);
   };
 
-  const handlePost = () => {
+  const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    if (!titleRef.current?.value || !textRef.current?.value || !community) {
+      alert("Please fill in the blanks");
+      return;
+    }
+    if (!session) {
+      alert("Please log in");
+      return;
+    }
+
+    const response = await axios.post("api/createPost", {
+      subreddit: community,
+      username: session?.user?.name,
+      title: titleRef.current.value,
+      content: textRef.current.value,
+      comments: [],
+      vote: 0,
+    });
+
     router.push("/");
   };
 
   useEffect(() => {
-    const handleClickOutside = (event: MouseEvent) => {
-      if (event.target !== menuRef.current) setIsChooseCommunitiesOpen(false);
-    };
-    document.body.addEventListener("click", handleClickOutside);
-    return () => document.body.removeEventListener("click", handleClickOutside);
+    setCommunities(data.communities);
   }, []);
 
   return (
@@ -56,21 +87,21 @@ const CreatePost: NextPage = () => {
             <div className="select-none">
               <div
                 ref={menuRef}
-                onClick={() => setIsChooseCommunitiesOpen((prev) => !prev)}
+                onClick={() => setIsCommunitiesOpen((prev) => !prev)}
                 className="bg-neutral-900 border border-neutral-700 rounded-md my-2 p-2 w-fit font-semibold text-sm flex items-center gap-8 cursor-pointer"
               >
-                {community ? <>{community}</> : <>Choose a community</>}
+                {community ? <>r/{community}</> : <>Choose a community</>}
                 <MdKeyboardArrowDown className="ml-auto" />
               </div>
-              {isChooseCommunityOpen && (
+              {isCommunitiesOpen && (
                 <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md max-w-fit text-sm flex flex-col justify-center divide-y divide-neutral-700">
                   {communities.map((community, index) => (
                     <div
                       key={index}
-                      onClick={() => handleChooseCommunity(community)}
+                      onClick={() => handleChooseCommunity(community.name)}
                       className="p-2 cursor-pointer hover:bg-neutral-800"
                     >
-                      {community}
+                      r/{community.name}
                     </div>
                   ))}
                 </div>
@@ -103,21 +134,7 @@ const CreatePost: NextPage = () => {
             </div>
           </div>
         </div>
-        <div className="hidden lg:flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-60 p-2">
-          <h2 className="font-semibold">Home</h2>
-          <p>
-            Your personal Reddit frontpage. Come here to check in with your
-            favorite communities.
-          </p>
-          <Link href="create">
-            <button className="bg-white bg-opacity-80 hover:bg-opacity-70 text-neutral-900 font-bold rounded-full py-1">
-              Create post
-            </button>
-          </Link>
-          <button className="bg-white bg-opacity-0 hover:bg-opacity-5 border font-bold rounded-full py-1">
-            Create community
-          </button>
-        </div>
+        <CreateBox />
       </main>
     </div>
   );

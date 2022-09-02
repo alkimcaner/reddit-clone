@@ -49,7 +49,7 @@ const Navbar = () => {
           <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
             <IoNotificationsOutline />
           </div>
-          <Link href="create">
+          <Link href="create-post">
             <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
               <AiOutlinePlus />
             </div>
@@ -64,14 +64,14 @@ const Navbar = () => {
         >
           <div className="w-8 h-8 relative rounded-full overflow-hidden">
             <Image
-              src={session?.user?.image || redditLogo}
+              src={session.user?.image || redditLogo}
               alt=""
               layout="fill"
               objectFit="cover"
             />
           </div>
           <div className="hidden md:block min-w-max">
-            <p className="text-sm">{session?.user?.name}</p>
+            <p className="text-sm">{session.user?.name}</p>
             <p className="text-xs text-neutral-400">999 karma</p>
           </div>
           <BiLogOut className="text-neutral-400 text-xl md:ml-4" />
