@@ -1,11 +1,25 @@
-import React, { MouseEvent, useRef } from "react";
+import React, { MouseEvent, useRef, useEffect } from "react";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import CreateBox from "../components/CreateBox";
+import HomeWidget from "../components/HomeWidget";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]";
+
+export const getServerSideProps = async (ctx: any) => {
+  //Redirect to homepage if not logged in
+  const session = await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+  if (!session) return { redirect: { destination: "/" }, props: {} };
+
+  return { props: {} };
+};
 
 const CreateCommunity: NextPage = () => {
   const router = useRouter();
@@ -15,11 +29,6 @@ const CreateCommunity: NextPage = () => {
   const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    if (!session) {
-      alert("Please log in");
-      return;
-    }
-
     if (!textRef.current?.value) {
       alert("Please enter a community name");
       return;
@@ -27,7 +36,7 @@ const CreateCommunity: NextPage = () => {
 
     const response = await axios.post("api/createCommunity", {
       name: textRef.current.value,
-      admin: session.user?.name,
+      admin: session?.user?.name,
     });
 
     router.push("/");
@@ -51,13 +60,13 @@ const CreateCommunity: NextPage = () => {
             </h1>
 
             <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
-              <div className="border border-neutral-700 rounded-md w-full flex items-center gap-2">
+              <div className="border border-neutral-700 rounded-md w-full flex items-center gap-1 focus-within:border-white">
                 <p className="ml-2">r/</p>
                 <input
                   ref={textRef}
                   type="text"
                   placeholder="Name"
-                  className="bg-transparent p-2 w-full"
+                  className="bg-transparent py-2 w-full outline-none"
                 />
               </div>
 
@@ -72,7 +81,7 @@ const CreateCommunity: NextPage = () => {
             </div>
           </div>
         </div>
-        <CreateBox />
+        <HomeWidget />
       </main>
     </div>
   );

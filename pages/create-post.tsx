@@ -7,10 +7,20 @@ import { useRouter } from "next/router";
 import { useClickOutside } from "../hooks/useClickOutside";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import CreateBox from "../components/CreateBox";
 import { CommunityType } from "../types/CommunityType";
+import HomeWidget from "../components/HomeWidget";
+import { unstable_getServerSession } from "next-auth";
+import { authOptions } from "./api/auth/[...nextauth]";
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: any) => {
+  //Redirect to homepage if not logged in
+  const session = await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+  if (!session) return { redirect: { destination: "/" }, props: {} };
+
   try {
     const response = await axios.get(
       process.env.NEXTAUTH_URL + "api/getCommunities"
@@ -43,10 +53,6 @@ const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
 
   const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (!session) {
-      alert("Please log in");
-      return;
-    }
 
     if (!titleRef.current?.value || !textRef.current?.value || !community) {
       alert("Please fill in the blanks");
@@ -135,7 +141,7 @@ const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
             </div>
           </div>
         </div>
-        <CreateBox />
+        <HomeWidget />
       </main>
     </div>
   );

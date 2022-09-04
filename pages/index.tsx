@@ -2,7 +2,7 @@ import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
 import { useEffect, useState } from "react";
-import CreateBox from "../components/CreateBox";
+import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
 import { PostType } from "../types/PostType";
@@ -42,7 +42,7 @@ const Home: NextPage<{ data: PostType[] }> = ({ data }) => {
             <Post key={post._id} post={post} />
           ))}
         </div>
-        <CreateBox />
+        <HomeWidget />
       </main>
     </div>
   );

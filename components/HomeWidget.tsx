@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React from "react";
 
-const CreateBox = () => {
+const HomeWidget = () => {
   const { data: session } = useSession();
 
   return (
@@ -30,4 +30,4 @@ const CreateBox = () => {
   );
 };
 
-export default CreateBox;
+export default HomeWidget;
