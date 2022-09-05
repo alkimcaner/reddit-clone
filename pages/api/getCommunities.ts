@@ -7,6 +7,10 @@ export default async function handler(
   res: NextApiResponse
 ) {
   try {
+    if (req.method !== "GET") {
+      res.status(400).json({ message: "Please send a get request" });
+    }
+
     await connectMongo();
     const posts = await Community.find().sort({ createdAt: -1 });
     res.status(200).json(posts);
