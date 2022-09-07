@@ -14,12 +14,12 @@ const HomeWidget = () => {
       </p>
       {session && (
         <>
-          <Link href="create-post">
+          <Link href="/create-post">
             <button className="bg-white bg-opacity-80 hover:bg-opacity-70 text-neutral-900 font-bold rounded-full py-1">
               Create post
             </button>
           </Link>
-          <Link href="create-community">
+          <Link href="/create-community">
             <button className="bg-white bg-opacity-0 hover:bg-opacity-5 border font-bold rounded-full py-1">
               Create community
             </button>

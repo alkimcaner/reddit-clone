@@ -19,23 +19,23 @@ export const getServerSideProps = async (ctx: any) => {
     ctx.res,
     authOptions
   );
-  if (!session) return { redirect: { destination: "/" }, props: {} };
+  if (!session) return { redirect: { destination: "/" } };
 
   try {
     const response = await axios.get(
       process.env.NEXTAUTH_URL + "api/getCommunities"
     );
-    const communities = response.data;
+    const communitiesData = response.data;
     return {
-      props: { data: { communities } },
+      props: { communitiesData },
     };
   } catch (error) {
     console.log(error);
   }
 };
 
-const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
-  data,
+const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
+  communitiesData,
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
@@ -60,7 +60,7 @@ const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
     }
 
     const response = await axios.post("api/createPost", {
-      subreddit: community,
+      community: community,
       username: session?.user?.name,
       title: titleRef.current.value,
       content: textRef.current.value,
@@ -72,7 +72,7 @@ const CreatePost: NextPage<{ data: { communities: CommunityType[] } }> = ({
   };
 
   useEffect(() => {
-    setCommunities(data.communities);
+    setCommunities(communitiesData);
   }, []);
 
   return (

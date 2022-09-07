@@ -27,13 +27,13 @@ const Navbar = () => {
         </div>
       </Link>
       {/* Communities */}
-      <div className="mr-auto md:mr-0 flex gap-2 items-center p-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none">
+      <div className="mr-auto lg:mr-0 flex gap-2 items-center p-1 rounded-sm ring-neutral-700 hover:ring-1 cursor-pointer select-none">
         <AiFillHome className="text-2xl" />
         <span className="text-sm hidden md:inline">Home</span>
         <MdKeyboardArrowDown className="md:ml-32" />
       </div>
       {/* Search */}
-      <div className="mr-auto px-4 py-1 hidden md:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 w-[48rem]">
+      <div className="mr-auto px-4 py-1 hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 w-[48rem]">
         <AiOutlineSearch className="text-2xl" />
         <input
           className="bg-transparent outline-none text-white text-sm w-full"
@@ -49,7 +49,7 @@ const Navbar = () => {
           <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
             <IoNotificationsOutline />
           </div>
-          <Link href="create-post">
+          <Link href="/create-post">
             <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
               <AiOutlinePlus />
             </div>

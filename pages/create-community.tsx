@@ -16,7 +16,7 @@ export const getServerSideProps = async (ctx: any) => {
     ctx.res,
     authOptions
   );
-  if (!session) return { redirect: { destination: "/" }, props: {} };
+  if (!session) return { redirect: { destination: "/" } };
 
   return { props: {} };
 };
@@ -24,18 +24,20 @@ export const getServerSideProps = async (ctx: any) => {
 const CreateCommunity: NextPage = () => {
   const router = useRouter();
   const { data: session } = useSession();
-  const textRef = useRef<HTMLInputElement>(null);
+  const nameRef = useRef<HTMLInputElement>(null);
+  const aboutRef = useRef<HTMLTextAreaElement>(null);
 
   const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
 
-    if (!textRef.current?.value) {
+    if (!nameRef.current?.value || !aboutRef.current?.value) {
       alert("Please enter a community name");
       return;
     }
 
     const response = await axios.post("api/createCommunity", {
-      name: textRef.current.value,
+      name: nameRef.current.value,
+      about: aboutRef.current.value,
       admin: session?.user?.name,
     });
 
@@ -63,10 +65,17 @@ const CreateCommunity: NextPage = () => {
               <div className="border border-neutral-700 rounded-md w-full flex items-center gap-1 focus-within:border-white">
                 <p className="ml-2">r/</p>
                 <input
-                  ref={textRef}
+                  ref={nameRef}
                   type="text"
                   placeholder="Name"
                   className="bg-transparent py-2 w-full outline-none"
+                />
+              </div>
+              <div className="border border-neutral-700 rounded-md w-full">
+                <textarea
+                  ref={aboutRef}
+                  placeholder="About"
+                  className="bg-transparent p-2 w-full min-h-[8rem]"
                 />
               </div>
 

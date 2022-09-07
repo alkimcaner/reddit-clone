@@ -1,6 +1,6 @@
 export interface PostType {
   _id: string;
-  subreddit: string;
+  community: string;
   username: string;
   title: string;
   content: string;

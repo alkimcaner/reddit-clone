@@ -2,7 +2,7 @@ import { Schema, model, models } from "mongoose";
 
 const postSchema = new Schema(
   {
-    subreddit: { type: String, required: true },
+    community: { type: String, required: true },
     username: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },

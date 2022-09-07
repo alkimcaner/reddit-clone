@@ -1,7 +1,6 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import { useEffect, useState } from "react";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
@@ -10,22 +9,16 @@ import { PostType } from "../types/PostType";
 export const getServerSideProps = async () => {
   try {
     const response = await axios.get(process.env.NEXTAUTH_URL + "api/getPosts");
-    const data: PostType[] = response.data;
+    const postsData: PostType[] = response.data;
     return {
-      props: { data },
+      props: { postsData },
     };
   } catch (error) {
     console.log(error);
   }
 };
 
-const Home: NextPage<{ data: PostType[] }> = ({ data }) => {
-  const [posts, setPosts] = useState<PostType[]>([]);
-
-  useEffect(() => {
-    setPosts(data);
-  }, []);
-
+const Home: NextPage<{ postsData: PostType[] }> = ({ postsData }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -38,7 +31,7 @@ const Home: NextPage<{ data: PostType[] }> = ({ data }) => {
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {posts.map((post) => (
+          {postsData?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </div>
