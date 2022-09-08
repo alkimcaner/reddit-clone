@@ -39,17 +39,12 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
-  const [isCommunitiesOpen, setIsCommunitiesOpen] = useState(false);
-  const [communities, setCommunities] = useState<CommunityType[]>([]);
+  const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
+  const [communityList, setCommunityList] = useState<CommunityType[]>([]);
   const [community, setCommunity] = useState<string>();
   const titleRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
-  const menuRef = useClickOutside(() => setIsCommunitiesOpen(false));
-
-  const handleChooseCommunity = (community: string) => {
-    setCommunity(community);
-    setIsCommunitiesOpen(false);
-  };
+  const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
 
   const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -72,7 +67,7 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
   };
 
   useEffect(() => {
-    setCommunities(communitiesData);
+    setCommunityList(communitiesData);
   }, []);
 
   return (
@@ -87,26 +82,26 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          <div>
-            <h1 className="py-4 mb-4 font-bold text-lg border-b border-neutral-700">
+          <div className="flex flex-col gap-4">
+            <h1 className="py-4 font-bold text-lg border-b border-neutral-700">
               Create a post
             </h1>
             <div className="select-none">
               <div
                 ref={menuRef}
-                onClick={() => setIsCommunitiesOpen((prev) => !prev)}
-                className="bg-neutral-900 border border-neutral-700 rounded-md my-2 p-2 w-fit font-semibold text-sm flex items-center gap-8 cursor-pointer"
+                onClick={() => setIsCommunityMenuOpen((prev) => !prev)}
+                className="bg-neutral-900 border border-neutral-700 rounded-md p-2 w-fit font-semibold text-sm flex items-center gap-8 cursor-pointer"
               >
                 {community ? <>r/{community}</> : <>Choose a community</>}
                 <MdKeyboardArrowDown className="ml-auto" />
               </div>
-              {isCommunitiesOpen && (
-                <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md max-w-fit text-sm flex flex-col justify-center divide-y divide-neutral-700">
-                  {communities.map((community, index) => (
+              {isCommunityMenuOpen && (
+                <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 max-w-fit text-sm flex flex-col justify-center cursor-pointer">
+                  {communityList.map((community, index) => (
                     <div
                       key={index}
-                      onClick={() => handleChooseCommunity(community.name)}
-                      className="p-2 cursor-pointer hover:bg-neutral-800"
+                      onClick={() => setCommunity(community.name)}
+                      className="py-2 px-4 hover:bg-neutral-800"
                     >
                       r/{community.name}
                     </div>
