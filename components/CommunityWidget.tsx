@@ -12,7 +12,10 @@ const CommunityWidget = ({
   const { data: session } = useSession();
   const [communityCreatedAt, setCommunityCreatedAt] = useState<Date>();
 
-  useEffect(() => setCommunityCreatedAt(communityData.createdAt), []);
+  useEffect(
+    () => setCommunityCreatedAt(communityData.createdAt),
+    [communityData]
+  );
 
   return (
     <div className="row-start-1 lg:row-start-auto col-span-3 lg:col-span-1 flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-fit px-2 py-4">

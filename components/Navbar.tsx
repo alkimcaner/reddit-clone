@@ -61,7 +61,7 @@ const Navbar = () => {
           <MdKeyboardArrowDown className="ml-auto" />
         </div>
         {isCommunityMenuOpen && (
-          <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 max-w-fit text-sm flex flex-col justify-center cursor-pointer">
+          <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 w-64 text-sm flex flex-col justify-center cursor-pointer">
             <span className="py-2 px-4 text-[.6rem] text-neutral-500 font-bold">
               YOUR COMMUNITIES
             </span>

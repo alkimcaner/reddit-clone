@@ -90,13 +90,13 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
               <div
                 ref={menuRef}
                 onClick={() => setIsCommunityMenuOpen((prev) => !prev)}
-                className="bg-neutral-900 border border-neutral-700 rounded-md p-2 w-fit font-semibold text-sm flex items-center gap-8 cursor-pointer"
+                className="bg-neutral-900 border border-neutral-700 rounded-md p-2 w-64 font-semibold text-sm flex items-center gap-8 cursor-pointer"
               >
                 {community ? <>r/{community}</> : <>Choose a community</>}
                 <MdKeyboardArrowDown className="ml-auto" />
               </div>
               {isCommunityMenuOpen && (
-                <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 max-w-fit text-sm flex flex-col justify-center cursor-pointer">
+                <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 w-64 text-sm flex flex-col justify-center cursor-pointer">
                   {communityList.map((community, index) => (
                     <div
                       key={index}
