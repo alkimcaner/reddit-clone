@@ -4,7 +4,7 @@ import Navbar from "../components/Navbar";
 import { NextPage } from "next";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from "next/router";
-import { useClickOutside } from "../hooks/useClickOutside";
+import useClickOutside from "../hooks/useClickOutside";
 import axios from "axios";
 import { useSession } from "next-auth/react";
 import { CommunityType } from "../types/CommunityType";

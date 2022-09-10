@@ -2,14 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
-import redditLogo from "../assets/redditLogo.png";
-import redditLogoText from "../assets/redditLogoText.png";
 import { AiFillHome, AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { BsChatDots } from "react-icons/bs";
 import { BiLogOut } from "react-icons/bi";
-import { useClickOutside } from "../hooks/useClickOutside";
+import useClickOutside from "../hooks/useClickOutside";
 import { useRouter } from "next/router";
 import axios from "axios";
 import { CommunityType } from "../types/CommunityType";
@@ -21,12 +19,11 @@ const Navbar = () => {
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
   const [communityList, setCommunityList] = useState<CommunityType[]>([]);
 
-  const handleGetCommunityList = async () => {
-    const response = await axios.get("/api/getCommunities");
-    setCommunityList(response.data);
-  };
-
   useEffect(() => {
+    const handleGetCommunityList = async () => {
+      const response = await axios.get("/api/getCommunities");
+      setCommunityList(response.data);
+    };
     handleGetCommunityList();
   }, []);
 
@@ -36,10 +33,10 @@ const Navbar = () => {
       <Link href="/">
         <div className="flex gap-2 items-center cursor-pointer">
           <div className="h-8 w-8 relative">
-            <Image src={redditLogo} alt="" layout="fill" />
+            <Image src={"/assets/redditLogo.png"} alt="" layout="fill" />
           </div>
           <div className="h-4 w-[3.25rem] relative hidden md:inline">
-            <Image src={redditLogoText} alt="" layout="fill" />
+            <Image src={"/assets/redditLogoText.png"} alt="" layout="fill" />
           </div>
         </div>
       </Link>
@@ -115,7 +112,7 @@ const Navbar = () => {
         >
           <div className="w-8 h-8 relative rounded-full overflow-hidden">
             <Image
-              src={session.user?.image || redditLogo}
+              src={session.user?.image || "/assets/redditLogo.png"}
               alt=""
               layout="fill"
               objectFit="cover"

@@ -8,7 +8,7 @@ import Link from "next/link";
 const Post = ({ post }: { post: PostType }) => {
   const [postCreatedAt, setPostCreatedAt] = useState<Date>();
 
-  useEffect(() => setPostCreatedAt(post.createdAt), []);
+  useEffect(() => setPostCreatedAt(post.createdAt), [post]);
 
   return (
     <div className="bg-neutral-900 border border-neutral-700 rounded-md flex">
@@ -30,7 +30,8 @@ const Post = ({ post }: { post: PostType }) => {
           </Link>
           <span className="text-neutral-500 font-normal">
             {" "}
-            • Posted by u/{post?.username} <TimeAgo date={postCreatedAt!} />
+            • Posted by u/{post?.username}{" "}
+            {postCreatedAt && <TimeAgo date={postCreatedAt} />}
           </span>
         </div>
         <div className="font-semibold text-lg">{post?.title}</div>

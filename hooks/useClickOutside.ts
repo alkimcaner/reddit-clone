@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 
-export const useClickOutside = (callback: Function) => {
+const useClickOutside = (callback: Function) => {
   const domRef = useRef<any>(null);
 
   useEffect(() => {
@@ -13,3 +13,5 @@ export const useClickOutside = (callback: Function) => {
 
   return domRef;
 };
+
+export default useClickOutside;

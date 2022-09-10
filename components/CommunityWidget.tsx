@@ -23,7 +23,7 @@ const CommunityWidget = ({
         <h2 className="font-bold">r/{communityData?.name}</h2>
         <p className="text-xs text-neutral-500">
           Created by {communityData?.admin}{" "}
-          <TimeAgo date={communityCreatedAt!} />
+          {communityCreatedAt && <TimeAgo date={communityCreatedAt} />}
         </p>
       </div>
       <div>
