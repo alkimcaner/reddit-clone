@@ -5,30 +5,27 @@ import React from "react";
 import CommunityWidget from "../../components/CommunityWidget";
 import Navbar from "../../components/Navbar";
 import Post from "../../components/Post";
-import { CommunityType } from "../../types/CommunityType";
-import { PostType } from "../../types/PostType";
+import { CommunityType } from "../../types/community";
+import { PostType } from "../../types/post";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
     const communityRes = await axios.get(
-      process.env.NEXTAUTH_URL +
-        "api/getCommunities?name=" +
-        ctx.query?.community
+      process.env.NEXTAUTH_URL + "api/community?name=" + ctx.query?.community
     );
     const communityData = communityRes.data[0];
 
     if (!communityData) return { redirect: { destination: "/" } };
 
     const postsRes = await axios.get(
-      process.env.NEXTAUTH_URL +
-        "api/getPosts?community=" +
-        ctx.query?.community
+      process.env.NEXTAUTH_URL + "api/post?community=" + ctx.query?.community
     );
     const postsData = postsRes.data;
 
     return { props: { communityData, postsData } };
   } catch (error) {
     console.log(error);
+    return { props: {} };
   }
 };
 
@@ -48,11 +45,11 @@ const Community: NextPage<{
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {postsData.map((post) => (
+          {postsData?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </div>
-        <CommunityWidget communityData={communityData} />
+        {communityData && <CommunityWidget communityData={communityData} />}
       </main>
     </div>
   );

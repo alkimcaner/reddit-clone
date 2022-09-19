@@ -10,7 +10,7 @@ import { BiLogOut } from "react-icons/bi";
 import useClickOutside from "../hooks/useClickOutside";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { CommunityType } from "../types/CommunityType";
+import { CommunityType } from "../types/community";
 
 const Navbar = () => {
   const { data: session } = useSession();
@@ -21,7 +21,7 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleGetCommunityList = async () => {
-      const response = await axios.get("/api/getCommunities");
+      const response = await axios.get("/api/community");
       setCommunityList(response.data);
     };
     handleGetCommunityList();

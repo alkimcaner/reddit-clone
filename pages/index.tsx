@@ -4,17 +4,18 @@ import Head from "next/head";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
-import { PostType } from "../types/PostType";
+import { PostType } from "../types/post";
 
 export const getServerSideProps = async () => {
   try {
-    const response = await axios.get(process.env.NEXTAUTH_URL + "api/getPosts");
+    const response = await axios.get(process.env.NEXTAUTH_URL + "api/post");
     const postsData: PostType[] = response.data;
     return {
       props: { postsData },
     };
   } catch (error) {
     console.log(error);
+    return { props: {} };
   }
 };
 

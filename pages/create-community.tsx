@@ -35,7 +35,7 @@ const CreateCommunity: NextPage = () => {
       return;
     }
 
-    const response = await axios.post("api/createCommunity", {
+    const response = await axios.post("api/community", {
       name: nameRef.current.value,
       about: aboutRef.current.value,
       admin: session?.user?.name,

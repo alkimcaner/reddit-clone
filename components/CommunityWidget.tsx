@@ -2,7 +2,7 @@ import { useSession } from "next-auth/react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
-import { CommunityType } from "../types/CommunityType";
+import { CommunityType } from "../types/community";
 
 const CommunityWidget = ({
   communityData,

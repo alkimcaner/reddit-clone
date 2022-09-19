@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { GoArrowUp, GoArrowDown, GoComment } from "react-icons/go";
 import { BsBookmark } from "react-icons/bs";
 import TimeAgo from "react-timeago";
-import { PostType } from "../types/PostType";
+import { PostType } from "../types/post";
 import Link from "next/link";
 
 const Post = ({ post }: { post: PostType }) => {
@@ -11,7 +11,7 @@ const Post = ({ post }: { post: PostType }) => {
   useEffect(() => setPostCreatedAt(post.createdAt), [post]);
 
   return (
-    <div className="bg-neutral-900 border border-neutral-700 rounded-md flex">
+    <div className="bg-neutral-900 border border-neutral-700 rounded-md flex overflow-hidden">
       <div className="p-2 w-10 bg-black bg-opacity-20 text-xl flex flex-col items-center gap-2">
         <button className="bg-white bg-opacity-0 hover:bg-opacity-5 hover:text-orange-600 rounded-sm">
           <GoArrowUp />

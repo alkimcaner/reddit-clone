@@ -7,7 +7,7 @@ import { useRouter } from "next/router";
 import useClickOutside from "../hooks/useClickOutside";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { CommunityType } from "../types/CommunityType";
+import { CommunityType } from "../types/community";
 import HomeWidget from "../components/HomeWidget";
 import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
@@ -23,24 +23,24 @@ export const getServerSideProps = async (ctx: any) => {
 
   try {
     const response = await axios.get(
-      process.env.NEXTAUTH_URL + "api/getCommunities"
+      process.env.NEXTAUTH_URL + "api/community"
     );
-    const communitiesData = response.data;
+    const communities = response.data;
     return {
-      props: { communitiesData },
+      props: { communities },
     };
   } catch (error) {
     console.log(error);
+    return { props: {} };
   }
 };
 
-const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
-  communitiesData,
+const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
+  communities,
 }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
-  const [communityList, setCommunityList] = useState<CommunityType[]>([]);
   const [community, setCommunity] = useState<string>();
   const titleRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
@@ -54,7 +54,7 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
       return;
     }
 
-    const response = await axios.post("api/createPost", {
+    const response = await axios.post("api/post", {
       community: community,
       username: session?.user?.name,
       title: titleRef.current.value,
@@ -65,10 +65,6 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
 
     router.push("/");
   };
-
-  useEffect(() => {
-    setCommunityList(communitiesData);
-  }, []);
 
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
@@ -97,7 +93,7 @@ const CreatePost: NextPage<{ communitiesData: CommunityType[] }> = ({
               </div>
               {isCommunityMenuOpen && (
                 <div className="absolute overflow-hidden bg-neutral-900 border border-neutral-700 rounded-md mt-1 w-64 text-sm flex flex-col justify-center cursor-pointer">
-                  {communityList.map((community, index) => (
+                  {communities?.map((community, index) => (
                     <div
                       key={index}
                       onClick={() => setCommunity(community.name)}
