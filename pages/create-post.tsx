@@ -48,22 +48,25 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
 
   const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    try {
+      if (!titleRef.current?.value || !textRef.current?.value || !community) {
+        alert("Please fill in the blanks");
+        return;
+      }
 
-    if (!titleRef.current?.value || !textRef.current?.value || !community) {
-      alert("Please fill in the blanks");
-      return;
+      const response = await axios.post("api/post", {
+        community: community,
+        username: session?.user?.name,
+        title: titleRef.current.value,
+        content: textRef.current.value,
+        comments: [],
+        vote: 0,
+      });
+
+      router.push("/");
+    } catch (error) {
+      console.log(error);
     }
-
-    const response = await axios.post("api/post", {
-      community: community,
-      username: session?.user?.name,
-      title: titleRef.current.value,
-      content: textRef.current.value,
-      comments: [],
-      vote: 0,
-    });
-
-    router.push("/");
   };
 
   return (

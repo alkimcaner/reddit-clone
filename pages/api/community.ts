@@ -2,6 +2,7 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
 import {
   getCommunity,
   createCommunity,
+  deleteCommunity,
 } from "../../controllers/communityController";
 
 const handler: NextApiHandler = async (
@@ -15,8 +16,11 @@ const handler: NextApiHandler = async (
     case "POST":
       await createCommunity(req, res);
       break;
+    case "DELETE":
+      await deleteCommunity(req, res);
+      break;
     default:
-      res.status(400).json({ message: "Invalid request" });
+      return res.status(400).json({ message: "Invalid request" });
       break;
   }
 };

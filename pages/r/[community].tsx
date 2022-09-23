@@ -13,16 +13,16 @@ export const getServerSideProps = async (ctx: any) => {
     const communityRes = await axios.get(
       process.env.NEXTAUTH_URL + "api/community?name=" + ctx.query?.community
     );
-    const communityData = communityRes.data[0];
+    const community = communityRes.data[0];
 
-    if (!communityData) return { redirect: { destination: "/" } };
+    if (!community) return { redirect: { destination: "/" } };
 
     const postsRes = await axios.get(
       process.env.NEXTAUTH_URL + "api/post?community=" + ctx.query?.community
     );
-    const postsData = postsRes.data;
+    const posts = postsRes.data;
 
-    return { props: { communityData, postsData } };
+    return { props: { community, posts } };
   } catch (error) {
     console.log(error);
     return { props: {} };
@@ -30,9 +30,9 @@ export const getServerSideProps = async (ctx: any) => {
 };
 
 const Community: NextPage<{
-  communityData: CommunityType;
-  postsData: PostType[];
-}> = ({ communityData, postsData }) => {
+  community: CommunityType;
+  posts: PostType[];
+}> = ({ community, posts }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -45,11 +45,11 @@ const Community: NextPage<{
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {postsData?.map((post) => (
+          {posts?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
         </div>
-        {communityData && <CommunityWidget communityData={communityData} />}
+        {community && <CommunityWidget community={community} />}
       </main>
     </div>
   );

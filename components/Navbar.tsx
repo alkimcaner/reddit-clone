@@ -3,6 +3,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
 import { AiFillHome, AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
+import { FcGoogle } from "react-icons/fc";
 import { MdKeyboardArrowDown } from "react-icons/md";
 import { IoNotificationsOutline } from "react-icons/io5";
 import { BsChatDots } from "react-icons/bs";
@@ -21,8 +22,12 @@ const Navbar = () => {
 
   useEffect(() => {
     const handleGetCommunityList = async () => {
-      const response = await axios.get("/api/community");
-      setCommunityList(response.data);
+      try {
+        const response = await axios.get("/api/community");
+        setCommunityList(response.data);
+      } catch (error) {
+        console.log(error);
+      }
     };
     handleGetCommunityList();
   }, []);
@@ -126,10 +131,12 @@ const Navbar = () => {
         </div>
       ) : (
         <div
-          onClick={() => signIn()}
+          onClick={() => signIn("google")}
           className="min-w-max flex gap-2 items-center px-8 py-1 rounded-full ring-blue-700 ring-1 cursor-pointer select-none hover:bg-blue-700"
         >
-          <p>Log In</p>
+          <p className="flex gap-1 items-center">
+            Sign in with <FcGoogle />
+          </p>
         </div>
       )}
     </nav>

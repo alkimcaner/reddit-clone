@@ -1,5 +1,9 @@
 import { NextApiHandler, NextApiRequest, NextApiResponse } from "next";
-import { getPost, createPost } from "../../controllers/postController";
+import {
+  getPost,
+  createPost,
+  deletePost,
+} from "../../controllers/postController";
 
 const handler: NextApiHandler = async (
   req: NextApiRequest,
@@ -12,8 +16,11 @@ const handler: NextApiHandler = async (
     case "POST":
       await createPost(req, res);
       break;
+    case "DELETE":
+      await deletePost(req, res);
+      break;
     default:
-      res.status(400).json({ message: "Invalid request" });
+      return res.status(400).json({ message: "Invalid request" });
       break;
   }
 };

@@ -7,17 +7,18 @@ import { connectMongo } from "../utils/mongodb";
 export const getPost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     await connectMongo();
-    const posts = await Post.find(req.query).sort({ createdAt: -1 });
-    res.status(200).json(posts);
+    const post = await Post.find(req.query).sort({ createdAt: -1 });
+    return res.status(200).json(post);
   } catch (error: any) {
-    res.status(404).json({ message: error.message });
+    return res.status(404).json({ message: error.message });
   }
 };
 
 export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session) res.status(401).json({ message: "Please log in" });
+    if (!session)
+      return res.status(401).json({ message: "Authorization error" });
 
     const { community, username, title, content, comments, vote } = req.body;
     await connectMongo();
@@ -29,8 +30,25 @@ export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
       comments,
       vote,
     });
-    res.status(200).json(post);
+    return res.status(200).json(post);
   } catch (error: any) {
-    res.status(400).json({ message: error.message });
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+    if (!session)
+      return res.status(401).json({ message: "Authorization error" });
+
+    await connectMongo();
+    const post = await Post.findOneAndDelete({
+      _id: req.query._id,
+      username: session?.user?.name,
+    });
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
   }
 };

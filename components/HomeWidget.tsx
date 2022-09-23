@@ -15,7 +15,7 @@ const HomeWidget = () => {
       {session && (
         <>
           <Link href="/create-post">
-            <button className="bg-white bg-opacity-80 hover:bg-opacity-70 text-neutral-900 font-bold rounded-full py-1">
+            <button className="bg-white hover:bg-neutral-200 text-neutral-900 font-bold rounded-full py-1">
               Create post
             </button>
           </Link>

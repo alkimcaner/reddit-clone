@@ -29,19 +29,22 @@ const CreateCommunity: NextPage = () => {
 
   const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
+    try {
+      if (!nameRef.current?.value || !aboutRef.current?.value) {
+        alert("Please enter a community name");
+        return;
+      }
 
-    if (!nameRef.current?.value || !aboutRef.current?.value) {
-      alert("Please enter a community name");
-      return;
+      const response = await axios.post("api/community", {
+        name: nameRef.current.value,
+        about: aboutRef.current.value,
+        admin: session?.user?.name,
+      });
+
+      router.push("/");
+    } catch (error) {
+      console.log(error);
     }
-
-    const response = await axios.post("api/community", {
-      name: nameRef.current.value,
-      about: aboutRef.current.value,
-      admin: session?.user?.name,
-    });
-
-    router.push("/");
   };
 
   return (
