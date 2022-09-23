@@ -50,7 +50,8 @@ export const deleteCommunity = async (
       name: req.query.name,
       admin: session?.user?.name,
     });
-    const posts = await Post.deleteMany({ community: req.query.name });
+    const posts =
+      community && (await Post.deleteMany({ community: req.query.name }));
     return res.status(200).json(community);
   } catch (error: any) {
     console.log("CATCH BLOCK STILL RUNS");

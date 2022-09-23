@@ -2,7 +2,7 @@ import axios from "axios";
 import { useSession } from "next-auth/react";
 import Link from "next/link";
 import { useRouter } from "next/router";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
 import { CommunityType } from "../types/community";
 
@@ -11,14 +11,14 @@ const CommunityWidget = ({ community }: { community: CommunityType }) => {
   const router = useRouter();
   const [communityCreatedAt, setCommunityCreatedAt] = useState<Date>();
 
-  const handleDeleteCommunity = useCallback(async () => {
+  const handleDeleteCommunity = async () => {
     try {
       const res = await axios.delete(`/api/community?name=${community.name}`);
       router.push("/");
     } catch (error: any) {
       console.log(error);
     }
-  }, []);
+  };
 
   useEffect(() => setCommunityCreatedAt(community.createdAt), [community]);
 

@@ -52,3 +52,24 @@ export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ message: error.message });
   }
 };
+
+export const updatePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+    if (!session)
+      return res.status(401).json({ message: "Authorization error" });
+
+    const { postState } = req.body;
+    await connectMongo();
+    const post = await Post.findOneAndUpdate(
+      {
+        _id: req.query._id,
+        username: session?.user?.name,
+      },
+      postState
+    );
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+};

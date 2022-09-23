@@ -3,6 +3,7 @@ import {
   getPost,
   createPost,
   deletePost,
+  updatePost,
 } from "../../controllers/postController";
 
 const handler: NextApiHandler = async (
@@ -18,6 +19,9 @@ const handler: NextApiHandler = async (
       break;
     case "DELETE":
       await deletePost(req, res);
+      break;
+    case "PUT":
+      await updatePost(req, res);
       break;
     default:
       return res.status(400).json({ message: "Invalid request" });

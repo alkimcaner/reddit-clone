@@ -4,14 +4,8 @@ export interface PostType {
   username: string;
   title: string;
   content: string;
-  comments: {
-    _id: string;
-    username: string;
-    content: string;
-    vote: number;
-    createdAt: number;
-  }[];
-  vote: number;
+  comments: PostType[];
+  votes: { username: string; vote: boolean }[];
   createdAt: Date;
   updatedAt: Date;
 }

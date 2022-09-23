@@ -60,7 +60,7 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
         title: titleRef.current.value,
         content: textRef.current.value,
         comments: [],
-        vote: 0,
+        vote: [],
       });
 
       router.push("/");
