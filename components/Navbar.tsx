@@ -125,7 +125,7 @@ const Navbar = () => {
           </div>
           <div className="hidden md:block min-w-max">
             <p className="text-sm">{session.user?.name}</p>
-            <p className="text-xs text-neutral-400">999 karma</p>
+            <p className="text-xs text-neutral-400">0 karma</p>
           </div>
           <BiLogOut className="text-neutral-400 text-xl md:ml-4" />
         </div>
