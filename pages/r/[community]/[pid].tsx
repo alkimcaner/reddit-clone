@@ -1,5 +1,6 @@
 import axios from "axios";
 import { NextPage } from "next";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
 import React, { useState } from "react";
 import CommunityWidget from "../../../components/CommunityWidget";
@@ -11,14 +12,18 @@ import { PostType } from "../../../types/post";
 export const getServerSideProps = async (ctx: any) => {
   try {
     const communityRes = await axios.get(
-      process.env.NEXTAUTH_URL + "api/community?name=" + ctx.query?.community
+      encodeURI(
+        `${process.env.NEXTAUTH_URL}api/community?name=${ctx.query?.community}`
+      )
     );
     const community = communityRes.data[0];
 
     if (!community) return { redirect: { destination: "/" } };
 
     const postRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
+      encodeURI(
+        `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
+      )
     );
     const post = postRes.data[0];
 
@@ -35,6 +40,7 @@ const Community: NextPage<{
   community: CommunityType;
   post: PostType;
 }> = ({ community, post }) => {
+  const { data: session } = useSession();
   const [comments, setComments] = useState([]);
 
   return (
@@ -51,20 +57,22 @@ const Community: NextPage<{
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
           <Post key={post._id} post={post} />
 
-          <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
-            <div className="border border-neutral-700 rounded-md w-full">
-              <textarea
-                placeholder="What are your thoughts?"
-                className="bg-transparent p-2 w-full min-h-[8rem]"
-              />
-            </div>
+          {session && (
+            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
+              <div className="border border-neutral-700 rounded-md w-full">
+                <textarea
+                  placeholder="What are your thoughts?"
+                  className="bg-transparent p-2 w-full min-h-[8rem]"
+                />
+              </div>
 
-            <div className="flex justify-end">
-              <button className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold">
-                Comment
-              </button>
+              <div className="flex justify-end">
+                <button className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold">
+                  Comment
+                </button>
+              </div>
             </div>
-          </div>
+          )}
 
           <h1 className="py-4 mb-4 font-bold text-lg border-b border-neutral-700">
             Comments

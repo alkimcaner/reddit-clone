@@ -82,9 +82,9 @@ const Post = ({ post }: { post: PostType }) => {
       <div className="p-2 flex flex-col gap-2 w-full">
         <div className="text-xs flex">
           <Link href={`/r/${postState?.community}`}>
-            <span className="font-bold hover:underline hover:cursor-pointer">
+            <a className="font-bold hover:underline hover:cursor-pointer">
               r/{postState?.community}
-            </span>
+            </a>
           </Link>
           <div className="text-neutral-500 font-normal">
             <span className="mx-1">• Posted by u/{postState?.username}</span>

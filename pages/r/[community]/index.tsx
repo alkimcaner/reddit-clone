@@ -13,14 +13,17 @@ import subredditLogo from "../../../public/assets/subredditLogo.png";
 export const getServerSideProps = async (ctx: any) => {
   try {
     const communityRes = await axios.get(
-      process.env.NEXTAUTH_URL + "api/community?name=" + ctx.query?.community
+      encodeURI(
+        `${process.env.NEXTAUTH_URL}api/community?name=${ctx.query?.community}`
+      )
     );
     const community = communityRes.data[0];
-
     if (!community) return { redirect: { destination: "/" } };
 
     const postsRes = await axios.get(
-      process.env.NEXTAUTH_URL + "api/post?community=" + ctx.query?.community
+      encodeURI(
+        `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}`
+      )
     );
     const posts = postsRes.data;
 

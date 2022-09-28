@@ -23,7 +23,7 @@ export const getServerSideProps = async (ctx: any) => {
 
   try {
     const response = await axios.get(
-      process.env.NEXTAUTH_URL + "api/community"
+      `${process.env.NEXTAUTH_URL}api/community`
     );
     const communities = response.data;
     return {
@@ -88,7 +88,7 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
             <div
               ref={menuRef}
               onClick={() => setIsCommunityMenuOpen((prev) => !prev)}
-              className="bg-neutral-900 border border-neutral-700 rounded-md p-2 w-64 font-semibold text-sm flex items-center gap-8 cursor-pointer"
+              className="bg-neutral-900 border border-neutral-700 rounded-md p-2 w-64 text-sm flex items-center gap-8 cursor-pointer"
             >
               {community ? <>r/{community}</> : <>Choose a community</>}
               <MdKeyboardArrowDown className="ml-auto" />

@@ -5,8 +5,7 @@ import Link from "next/link";
 import { AiFillHome, AiOutlineSearch, AiOutlinePlus } from "react-icons/ai";
 import { FcGoogle } from "react-icons/fc";
 import { MdKeyboardArrowDown } from "react-icons/md";
-import { IoNotificationsOutline } from "react-icons/io5";
-import { BsChatDots } from "react-icons/bs";
+import { BsBookmark } from "react-icons/bs";
 import { BiLogOut } from "react-icons/bi";
 import useClickOutside from "../hooks/useClickOutside";
 import { useRouter } from "next/router";
@@ -36,14 +35,14 @@ const Navbar = () => {
     <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-neutral-300 flex gap-4 items-center px-4 border-b border-neutral-700">
       {/* Home */}
       <Link href="/">
-        <div className="flex gap-2 items-center cursor-pointer">
+        <a className="flex gap-2 items-center cursor-pointer">
           <div className="h-8 w-8 relative">
             <Image src={"/assets/redditLogo.png"} alt="" layout="fill" />
           </div>
           <div className="h-4 w-[3.25rem] relative hidden md:inline">
             <Image src={"/assets/redditLogoText.png"} alt="" layout="fill" />
           </div>
-        </div>
+        </a>
       </Link>
       {/* Communities */}
       <div className="mr-auto lg:mr-0 select-none">
@@ -69,17 +68,17 @@ const Navbar = () => {
             </span>
             {session && (
               <Link href="/create-community">
-                <div className="py-2 px-4 flex gap-2 items-center hover:bg-neutral-800">
+                <a className="py-2 px-4 flex gap-2 items-center hover:bg-neutral-800">
                   <AiOutlinePlus />
                   Create Community
-                </div>
+                </a>
               </Link>
             )}
             {communityList.map((community) => (
               <Link key={community._id} href={`/r/${community.name}`}>
-                <div className="py-2 px-4 hover:bg-neutral-800">
+                <a className="py-2 px-4 hover:bg-neutral-800">
                   {community.name}
-                </div>
+                </a>
               </Link>
             ))}
           </div>
@@ -97,15 +96,12 @@ const Navbar = () => {
       {session && (
         <div className="flex gap-1 items-center text-xl">
           <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-            <BsChatDots />
-          </div>
-          <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-            <IoNotificationsOutline />
+            <BsBookmark />
           </div>
           <Link href="/create-post">
-            <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
+            <a className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
               <AiOutlinePlus />
-            </div>
+            </a>
           </Link>
         </div>
       )}
