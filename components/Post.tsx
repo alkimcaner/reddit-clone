@@ -18,6 +18,7 @@ const Post = ({ post }: { post: PostType }) => {
   const menuRef = useClickOutside(() => setMenuVisible(false));
 
   const handleDeletePost = async () => {
+    if (!postState || postState?.username !== session?.user?.name) return;
     const res = await axios.delete(`/api/post?_id=${post._id}`);
     setPostState(null);
   };
@@ -112,13 +113,19 @@ const Post = ({ post }: { post: PostType }) => {
             </div>
           )}
         </div>
-        <div className="font-semibold text-lg">{postState?.title}</div>
+        <Link href={`/r/${postState.community}/${postState._id}`}>
+          <a className="w-fit font-semibold text-lg hover:underline">
+            {postState?.title}
+          </a>
+        </Link>
         <div>{postState?.content}</div>
         <div className="flex text-neutral-500 font-medium text-sm">
-          <button className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5">
-            <GoComment className="text-lg" />
-            {postState?.comments?.length} comments
-          </button>
+          <Link href={`/r/${postState.community}/${postState._id}`}>
+            <a className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5">
+              <GoComment className="text-lg" />
+              {postState?.comments?.length} comments
+            </a>
+          </Link>
           <button className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5">
             <BsBookmark className="text-lg" />
             Save

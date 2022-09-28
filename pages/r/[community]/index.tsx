@@ -1,12 +1,14 @@
 import axios from "axios";
 import { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
 import React from "react";
-import CommunityWidget from "../../components/CommunityWidget";
-import Navbar from "../../components/Navbar";
-import Post from "../../components/Post";
-import { CommunityType } from "../../types/community";
-import { PostType } from "../../types/post";
+import CommunityWidget from "../../../components/CommunityWidget";
+import Navbar from "../../../components/Navbar";
+import Post from "../../../components/Post";
+import { CommunityType } from "../../../types/community";
+import { PostType } from "../../../types/post";
+import subredditLogo from "../../../public/assets/subredditLogo.png";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
@@ -43,13 +45,29 @@ const Community: NextPage<{
 
       <Navbar />
 
+      <div className="bg-neutral-900 p-4">
+        <div className="max-w-5xl mx-auto flex gap-4 items-center">
+          <div className="w-12 h-12 relative">
+            <Image src={subredditLogo} layout="fill" alt="" />
+          </div>
+          <div>
+            <h1 className="text-3xl font-bold">
+              {community.name[0].toUpperCase() + community.name.substring(1)}
+            </h1>
+            <h1 className="text-neutral-500">r/{community.name}</h1>
+          </div>
+        </div>
+      </div>
+
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
-        <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
+        <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
           {posts?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
-        </div>
-        {community && <CommunityWidget community={community} />}
+        </section>
+        <section className="row-start-1 lg:row-start-auto col-span-3 lg:col-span-1">
+          {community && <CommunityWidget community={community} />}
+        </section>
       </main>
     </div>
   );

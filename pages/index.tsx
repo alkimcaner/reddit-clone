@@ -31,12 +31,14 @@ const Home: NextPage<{ postsData: PostType[] }> = ({ postsData }) => {
       <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
-        <div className="flex flex-col gap-4 col-span-3 lg:col-span-2">
+        <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
           {postsData?.map((post) => (
             <Post key={post._id} post={post} />
           ))}
-        </div>
-        <HomeWidget />
+        </section>
+        <section>
+          <HomeWidget />
+        </section>
       </main>
     </div>
   );

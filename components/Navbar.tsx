@@ -86,10 +86,10 @@ const Navbar = () => {
         )}
       </div>
       {/* Search */}
-      <div className="mr-auto px-4 py-1 hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-sm ring-1 ring-neutral-700 w-[48rem]">
+      <div className="group focus-within:ring-neutral-200 mr-auto px-4 py-2 hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-full ring-1 ring-neutral-700 w-[48rem]">
         <AiOutlineSearch className="text-2xl" />
         <input
-          className="bg-transparent outline-none text-white text-sm w-full"
+          className="bg-transparent outline-none text-neutral-200 placeholder-neutral-500 text-sm w-full"
           placeholder="Search Reddit"
         />
       </div>

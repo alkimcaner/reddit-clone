@@ -23,7 +23,7 @@ const CommunityWidget = ({ community }: { community: CommunityType }) => {
   useEffect(() => setCommunityCreatedAt(community.createdAt), [community]);
 
   return (
-    <div className="row-start-1 lg:row-start-auto col-span-3 lg:col-span-1 flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-fit px-2 py-4">
+    <div className="flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-fit px-2 py-4">
       <div className="border-b border-neutral-700 pb-4">
         <h2 className="font-bold">r/{community?.name}</h2>
         <p className="text-xs text-neutral-500">
