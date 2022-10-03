@@ -6,6 +6,7 @@ import {
   deleteComment,
   votePost,
   commentPost,
+  searchPost,
 } from "../../controllers/postController";
 
 const handler: NextApiHandler = async (
@@ -14,7 +15,8 @@ const handler: NextApiHandler = async (
 ) => {
   switch (req.method) {
     case "GET":
-      await getPost(req, res);
+      if (req.query.q) await searchPost(req, res);
+      else await getPost(req, res);
       break;
     case "POST":
       await createPost(req, res);

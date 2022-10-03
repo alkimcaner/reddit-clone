@@ -14,6 +14,21 @@ export const getPost = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
+export const searchPost = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    await connectMongo();
+    const post = await Post.find({
+      title: {
+        $regex: req.query.q,
+        $options: "i",
+      },
+    }).sort({ createdAt: -1 });
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(404).json({ message: error.message });
+  }
+};
+
 export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);

@@ -103,7 +103,7 @@ const Community: NextPage<{
           </h1>
 
           {comments?.length ? (
-            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
+            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-2">
               {comments.map((comment) => (
                 <Comment key={comment._id} comment={comment} />
               ))}

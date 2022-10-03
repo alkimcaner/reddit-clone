@@ -64,9 +64,13 @@ const Community: NextPage<{
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {posts?.map((post) => (
-            <Post key={post._id} post={post} />
-          ))}
+          {posts.length ? (
+            posts?.map((post) => <Post key={post._id} post={post} />)
+          ) : (
+            <p className="text-neutral-500 text-lg text-center mb-4">
+              There are no posts
+            </p>
+          )}
         </section>
         <section className="row-start-1 lg:row-start-auto col-span-3 lg:col-span-1">
           {community && <CommunityWidget community={community} />}

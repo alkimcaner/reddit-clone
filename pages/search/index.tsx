@@ -1,14 +1,16 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import HomeWidget from "../components/HomeWidget";
-import Navbar from "../components/Navbar";
-import Post from "../components/Post";
-import { PostType } from "../types/post";
+import HomeWidget from "../../components/HomeWidget";
+import Navbar from "../../components/Navbar";
+import Post from "../../components/Post";
+import { PostType } from "../../types/post";
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: any) => {
   try {
-    const response = await axios.get(`${process.env.NEXTAUTH_URL}api/post`);
+    const response = await axios.get(
+      `${process.env.NEXTAUTH_URL}api/post?q=${ctx.query?.q}`
+    );
     const postsData: PostType[] = response.data;
     return {
       props: { postsData },
