@@ -51,6 +51,26 @@ export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
   }
 };
 
+export const deleteComment = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+    if (!session)
+      return res.status(401).json({ message: "Authorization error" });
+
+    await connectMongo();
+    const post = await Post.findOne({ "comments._id": req.query._id });
+    post.comments.id(req.query._id).remove();
+    post.markModified("comments");
+    await post.save();
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
 export const votePost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);

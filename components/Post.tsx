@@ -20,7 +20,7 @@ const Post = ({ post }: { post: PostType }) => {
 
   const handleDeletePost = async () => {
     if (!postState || postState?.username !== session?.user?.name) return;
-    const res = await axios.delete(`/api/post?_id=${post._id}`);
+    const res = await axios.delete(`/api/post?type=post&_id=${post._id}`);
     router.reload();
   };
 
@@ -95,7 +95,7 @@ const Post = ({ post }: { post: PostType }) => {
             <span className="mx-1">• Posted by u/{postState?.username}</span>
             <span>{<TimeAgo date={postState?.createdAt} />}</span>
           </div>
-          {session?.user?.name === postState?.username && (
+          {postState?.username === session?.user?.name && (
             <div className="ml-auto relative select-none">
               <div
                 ref={menuRef}
