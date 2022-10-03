@@ -2,7 +2,9 @@ import axios from "axios";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useRef, useState, useEffect } from "react";
+import Comment from "../../../components/Comment";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
 import Post from "../../../components/Post";
@@ -41,7 +43,25 @@ const Community: NextPage<{
   post: PostType;
 }> = ({ community, post }) => {
   const { data: session } = useSession();
-  const [comments, setComments] = useState([]);
+  const router = useRouter();
+  const [comments, setComments] = useState<PostType["comments"]>();
+  const commentRef = useRef<HTMLTextAreaElement>(null);
+
+  const handleCommentPost = async () => {
+    if (!post || !session) return;
+
+    const content = commentRef?.current?.value;
+
+    const res = await axios.put(`/api/post?action=comment&_id=${post._id}`, {
+      content,
+    });
+
+    router.reload();
+  };
+
+  useEffect(() => {
+    setComments(post.comments);
+  }, []);
 
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
@@ -61,13 +81,17 @@ const Community: NextPage<{
             <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
               <div className="border border-neutral-700 rounded-md w-full">
                 <textarea
+                  ref={commentRef}
                   placeholder="What are your thoughts?"
                   className="bg-transparent p-2 w-full min-h-[8rem]"
                 />
               </div>
 
               <div className="flex justify-end">
-                <button className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold">
+                <button
+                  onClick={handleCommentPost}
+                  className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
+                >
                   Comment
                 </button>
               </div>
@@ -78,8 +102,12 @@ const Community: NextPage<{
             Comments
           </h1>
 
-          {comments.length ? (
-            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4"></div>
+          {comments?.length ? (
+            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
+              {comments.map((comment) => (
+                <Comment key={comment._id} comment={comment} />
+              ))}
+            </div>
           ) : (
             <p className="text-neutral-500 text-lg text-center mb-4">
               There are no comments

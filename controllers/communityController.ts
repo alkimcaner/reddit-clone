@@ -27,9 +27,13 @@ export const createCommunity = async (
     if (!session)
       return res.status(401).json({ message: "Authorization error" });
 
-    const { name, about, admin } = req.body;
+    const { name, about } = req.body;
     await connectMongo();
-    const community = await Community.create({ name, about, admin });
+    const community = await Community.create({
+      name,
+      about,
+      admin: session.user?.name,
+    });
     return res.status(200).json(community);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });
@@ -46,15 +50,11 @@ export const deleteCommunity = async (
       return res.status(401).json({ message: "Authorization error" });
 
     await connectMongo();
-    const community = await Community.findOneAndDelete({
-      name: req.query.name,
-      admin: session?.user?.name,
-    });
+    const community = await Community.findByIdAndDelete(req.query._id);
     const posts =
-      community && (await Post.deleteMany({ community: req.query.name }));
+      community && (await Post.deleteMany({ community: community.name }));
     return res.status(200).json(community);
   } catch (error: any) {
-    console.log("CATCH BLOCK STILL RUNS");
     return res.status(400).json({ message: error.message });
   }
 };

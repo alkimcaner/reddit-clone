@@ -9,6 +9,7 @@ import useClickOutside from "../hooks/useClickOutside";
 import axios from "axios";
 import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
+import Image from "next/image";
 
 const Post = ({ post }: { post: PostType }) => {
   const router = useRouter();
@@ -20,29 +21,28 @@ const Post = ({ post }: { post: PostType }) => {
   const handleDeletePost = async () => {
     if (!postState || postState?.username !== session?.user?.name) return;
     const res = await axios.delete(`/api/post?_id=${post._id}`);
-    setPostState(null);
+    router.reload();
   };
 
   const handleVotePost = async (vote: boolean) => {
-    if (!postState || postState?.username !== session?.user?.name) return;
-    let updatedPost = { ...postState };
+    if (!postState || !session) return;
+    let votes = postState.votes;
 
     const search = postState?.votes?.find(
       (x) => x.username === session!.user!.name
     );
-    if (!search)
-      updatedPost.votes.push({ username: session!.user!.name!, vote: vote });
+    if (!search) votes.push({ username: session!.user!.name!, vote: vote });
     else {
-      updatedPost.votes = updatedPost.votes.filter(
-        (x) => x.username !== session!.user!.name!
-      );
+      votes = votes.filter((x) => x.username !== session!.user!.name!);
     }
 
-    const res = await axios.put(`/api/post?_id=${post._id}`, {
-      postState: updatedPost,
+    const res = await axios.put(`/api/post?action=vote&_id=${post._id}`, {
+      votes,
     });
 
-    setPostState(updatedPost);
+    setPostState((prev) => {
+      return { ...prev!, votes };
+    });
   };
 
   useEffect(() => setPostState(post), [post]);
@@ -80,7 +80,12 @@ const Post = ({ post }: { post: PostType }) => {
         </button>
       </div>
       <div className="p-2 flex flex-col gap-2 w-full">
-        <div className="text-xs flex">
+        <div className="text-xs flex items-center">
+          {postState.userImage && (
+            <div className="relative w-6 h-6 overflow-hidden rounded-full mr-2">
+              <Image src={postState.userImage} alt="" layout="fill" />
+            </div>
+          )}
           <Link href={`/r/${postState?.community}`}>
             <a className="font-bold hover:underline hover:cursor-pointer">
               r/{postState?.community}

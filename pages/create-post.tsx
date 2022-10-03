@@ -6,7 +6,6 @@ import { MdKeyboardArrowDown } from "react-icons/md";
 import { useRouter } from "next/router";
 import useClickOutside from "../hooks/useClickOutside";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import { CommunityType } from "../types/community";
 import HomeWidget from "../components/HomeWidget";
 import { unstable_getServerSession } from "next-auth";
@@ -39,7 +38,6 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
   communities,
 }) => {
   const router = useRouter();
-  const { data: session } = useSession();
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
   const [community, setCommunity] = useState<string>();
   const titleRef = useRef<HTMLInputElement>(null);
@@ -56,11 +54,8 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
 
       const response = await axios.post("api/post", {
         community: community,
-        username: session?.user?.name,
         title: titleRef.current.value,
         content: textRef.current.value,
-        comments: [],
-        vote: [],
       });
 
       router.push("/");

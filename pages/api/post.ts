@@ -3,7 +3,8 @@ import {
   getPost,
   createPost,
   deletePost,
-  updatePost,
+  votePost,
+  commentPost,
 } from "../../controllers/postController";
 
 const handler: NextApiHandler = async (
@@ -21,7 +22,9 @@ const handler: NextApiHandler = async (
       await deletePost(req, res);
       break;
     case "PUT":
-      await updatePost(req, res);
+      if (req.query.action === "vote") await votePost(req, res);
+      else if (req.query.action === "comment") await commentPost(req, res);
+      else res.status(400).end();
       break;
     default:
       return res.status(400).json({ message: "Invalid request" });

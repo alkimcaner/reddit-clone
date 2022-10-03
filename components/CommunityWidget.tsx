@@ -14,7 +14,7 @@ const CommunityWidget = ({ community }: { community: CommunityType }) => {
   const handleDeleteCommunity = async () => {
     try {
       const res = await axios.delete(
-        encodeURI(`/api/community?name=${community.name}`)
+        encodeURI(`/api/community?_id=${community._id}`)
       );
       router.push("/");
     } catch (error: any) {

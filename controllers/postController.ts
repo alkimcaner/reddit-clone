@@ -20,15 +20,16 @@ export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
     if (!session)
       return res.status(401).json({ message: "Authorization error" });
 
-    const { community, username, title, content, comments, vote } = req.body;
+    const { community, title, content } = req.body;
     await connectMongo();
     const post = await Post.create({
       community,
-      username,
+      username: session.user?.name,
+      userImage: session.user?.image,
       title,
       content,
-      comments,
-      vote,
+      comments: [],
+      vote: [],
     });
     return res.status(200).json(post);
   } catch (error: any) {
@@ -43,31 +44,47 @@ export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(401).json({ message: "Authorization error" });
 
     await connectMongo();
-    const post = await Post.findOneAndDelete({
-      _id: req.query._id,
-      username: session?.user?.name,
-    });
+    const post = await Post.findByIdAndDelete(req.query._id);
     return res.status(200).json(post);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });
   }
 };
 
-export const updatePost = async (req: NextApiRequest, res: NextApiResponse) => {
+export const votePost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
     if (!session)
       return res.status(401).json({ message: "Authorization error" });
 
-    const { postState } = req.body;
+    const { votes } = req.body;
     await connectMongo();
-    const post = await Post.findOneAndUpdate(
-      {
-        _id: req.query._id,
-        username: session?.user?.name,
-      },
-      postState
-    );
+    const post = await Post.findByIdAndUpdate(req.query._id, { votes });
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const commentPost = async (
+  req: NextApiRequest,
+  res: NextApiResponse
+) => {
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+    if (!session)
+      return res.status(401).json({ message: "Authorization error" });
+
+    const { content } = req.body;
+    await connectMongo();
+    const post = await Post.findById(req.query._id);
+    post.comments.push({
+      content,
+      username: session.user?.name,
+      userImage: session.user?.image,
+    });
+    post.markModified("comments");
+    await post.save();
     return res.status(200).json(post);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });

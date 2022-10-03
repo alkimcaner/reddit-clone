@@ -38,7 +38,6 @@ const CreateCommunity: NextPage = () => {
       const response = await axios.post("api/community", {
         name: nameRef.current.value,
         about: aboutRef.current.value,
-        admin: session?.user?.name,
       });
 
       router.push("/");
