@@ -9,15 +9,19 @@ import Timeago from "react-timeago";
 import useClickOutside from "../hooks/useClickOutside";
 import { PostType } from "../types/post";
 
-const Comment = ({ comment }: { comment: PostType["comments"][number] }) => {
+interface IProps {
+  comment: PostType["comments"][number];
+}
+
+const Comment = ({ comment }: IProps) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [isMenuVisible, setMenuVisible] = useState(false);
   const menuRef = useClickOutside(() => setMenuVisible(false));
 
   const handleDeleteComment = async () => {
-    if (!comment || comment?.username !== session?.user?.name) return;
-    const res = await axios.delete(`/api/post?type=comment&_id=${comment._id}`);
+    if (!session || comment?.uid !== session?.user?.uid) return;
+    await axios.delete(`/api/post?type=comment&_id=${comment._id}`);
     router.reload();
   };
 
@@ -33,7 +37,7 @@ const Comment = ({ comment }: { comment: PostType["comments"][number] }) => {
         <span className="text-neutral-500 ml-1">
           • {<Timeago date={comment.createdAt} />}
         </span>
-        {comment?.username === session?.user?.name && (
+        {comment?.uid === session?.user?.uid && (
           <div className="ml-auto relative select-none">
             <div
               ref={menuRef}

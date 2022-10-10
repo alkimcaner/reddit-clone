@@ -24,15 +24,16 @@ export const createCommunity = async (
 ) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     const { name, about } = req.body;
     await connectMongo();
     const community = await Community.create({
+      uid: session.user.uid,
+      owner: session.user?.name,
       name,
       about,
-      admin: session.user?.name,
     });
     return res.status(200).json(community);
   } catch (error: any) {
@@ -46,13 +47,16 @@ export const deleteCommunity = async (
 ) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     await connectMongo();
-    const community = await Community.findByIdAndDelete(req.query._id);
-    const posts =
-      community && (await Post.deleteMany({ community: community.name }));
+    const community = await Community.findById(req.query._id);
+    if (session.user.uid !== community.uid) {
+      return res.status(401).json({ message: "Authorization error" });
+    }
+    await Community.findByIdAndDelete(req.query._id);
+    await Post.deleteMany({ community: community.name });
     return res.status(200).json(community);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });

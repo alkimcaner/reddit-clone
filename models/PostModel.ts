@@ -2,6 +2,7 @@ import { Schema, model, models } from "mongoose";
 
 const commentSchema = new Schema(
   {
+    uid: { type: String, required: true },
     username: { type: String, required: true },
     userImage: { type: String, required: true },
     content: { type: String, required: true },
@@ -11,13 +12,14 @@ const commentSchema = new Schema(
 
 const postSchema = new Schema(
   {
-    community: { type: String, required: true },
+    uid: { type: String, required: true },
     username: { type: String, required: true },
     userImage: { type: String, required: true },
+    community: { type: String, required: true },
     title: { type: String, required: true },
     content: { type: String, required: true },
     comments: [commentSchema],
-    votes: { type: [{ username: String, vote: Boolean }], required: true },
+    votes: { type: [{ uid: String, vote: Boolean }], required: true },
   },
   { timestamps: true }
 );

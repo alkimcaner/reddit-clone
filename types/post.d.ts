@@ -1,18 +1,20 @@
 export interface PostType {
   _id: string;
-  community: string;
+  uid: string;
   username: string;
   userImage: string;
+  community: string;
   title: string;
   content: string;
   comments: {
     _id: string;
+    uid: string;
     username: string;
     userImage: string;
     content: string;
     createdAt: Date;
   }[];
-  votes: { username: string; vote: boolean }[];
+  votes: { uid: string; vote: boolean }[];
   createdAt: Date;
   updatedAt: Date;
 }

@@ -10,6 +10,18 @@ export const authOptions: NextAuthOptions = {
     }),
     // ...add more providers here
   ],
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.uid = user.id;
+      }
+      return token;
+    },
+    async session({ session, token }) {
+      session.user.uid = token.uid as string;
+      return session;
+    },
+  },
   secret: process.env.NEXTAUTH_SECRET,
 };
 

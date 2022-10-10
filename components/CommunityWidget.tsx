@@ -6,16 +6,19 @@ import React, { useEffect, useState } from "react";
 import TimeAgo from "react-timeago";
 import { CommunityType } from "../types/community";
 
-const CommunityWidget = ({ community }: { community: CommunityType }) => {
+interface IProps {
+  community: CommunityType;
+}
+
+const CommunityWidget = ({ community }: IProps) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [communityCreatedAt, setCommunityCreatedAt] = useState<Date>();
 
   const handleDeleteCommunity = async () => {
     try {
-      const res = await axios.delete(
-        encodeURI(`/api/community?_id=${community._id}`)
-      );
+      if (!session || community?.uid !== session?.user?.uid) return;
+      await axios.delete(encodeURI(`/api/community?_id=${community._id}`));
       router.push("/");
     } catch (error: any) {
       console.log(error);
@@ -29,7 +32,7 @@ const CommunityWidget = ({ community }: { community: CommunityType }) => {
       <div className="border-b border-neutral-700 pb-4">
         <h2 className="font-bold">r/{community?.name}</h2>
         <p className="text-xs text-neutral-500">
-          Created by {community?.admin}{" "}
+          Created by {community?.owner}{" "}
           {communityCreatedAt && <TimeAgo date={communityCreatedAt} />}
         </p>
       </div>
@@ -37,7 +40,7 @@ const CommunityWidget = ({ community }: { community: CommunityType }) => {
         <h2 className="font-semibold text-neutral-500">About Community</h2>
         <p className="py-2">{community?.about}</p>
       </div>
-      {session?.user?.name === community.admin && (
+      {session?.user?.uid === community.uid && (
         <button
           onClick={handleDeleteCommunity}
           className="bg-red-500 hover:bg-red-600 text-neutral-200 font-bold rounded-full py-1 text-center"

@@ -32,15 +32,16 @@ export const searchPost = async (req: NextApiRequest, res: NextApiResponse) => {
 export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     const { community, title, content } = req.body;
     await connectMongo();
     const post = await Post.create({
-      community,
+      uid: session.user.uid,
       username: session.user?.name,
       userImage: session.user?.image,
+      community,
       title,
       content,
       comments: [],
@@ -55,11 +56,15 @@ export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
 export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     await connectMongo();
-    const post = await Post.findByIdAndDelete(req.query._id);
+    const post = await Post.findById(req.query._id);
+    if (session.user.uid !== post.uid) {
+      return res.status(401).json({ message: "Authorization error" });
+    }
+    await Post.findByIdAndDelete(req.query._id);
     return res.status(200).json(post);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });
@@ -72,11 +77,14 @@ export const deleteComment = async (
 ) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     await connectMongo();
     const post = await Post.findOne({ "comments._id": req.query._id });
+    if (session.user.uid !== post.uid) {
+      return res.status(401).json({ message: "Authorization error" });
+    }
     post.comments.id(req.query._id).remove();
     post.markModified("comments");
     await post.save();
@@ -89,9 +97,9 @@ export const deleteComment = async (
 export const votePost = async (req: NextApiRequest, res: NextApiResponse) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     const { votes } = req.body;
     await connectMongo();
     const post = await Post.findByIdAndUpdate(req.query._id, { votes });
@@ -107,16 +115,17 @@ export const commentPost = async (
 ) => {
   try {
     const session = await unstable_getServerSession(req, res, authOptions);
-    if (!session)
-      return res.status(401).json({ message: "Authorization error" });
-
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
     const { content } = req.body;
     await connectMongo();
     const post = await Post.findById(req.query._id);
     post.comments.push({
-      content,
+      uid: session.user.uid,
       username: session.user?.name,
       userImage: session.user?.image,
+      content,
     });
     post.markModified("comments");
     await post.save();

@@ -11,7 +11,11 @@ import { useRouter } from "next/router";
 import { useSession } from "next-auth/react";
 import Image from "next/image";
 
-const Post = ({ post }: { post: PostType }) => {
+interface IProps {
+  post: PostType;
+}
+
+const Post = ({ post }: IProps) => {
   const router = useRouter();
   const { data: session } = useSession();
   const [postState, setPostState] = useState<PostType | null>();
@@ -19,8 +23,8 @@ const Post = ({ post }: { post: PostType }) => {
   const menuRef = useClickOutside(() => setMenuVisible(false));
 
   const handleDeletePost = async () => {
-    if (!postState || postState?.username !== session?.user?.name) return;
-    const res = await axios.delete(`/api/post?type=post&_id=${post._id}`);
+    if (!session || postState?.uid !== session?.user?.uid) return;
+    await axios.delete(`/api/post?type=post&_id=${post._id}`);
     router.reload();
   };
 
@@ -28,15 +32,13 @@ const Post = ({ post }: { post: PostType }) => {
     if (!postState || !session) return;
     let votes = postState.votes;
 
-    const search = postState?.votes?.find(
-      (x) => x.username === session!.user!.name
-    );
-    if (!search) votes.push({ username: session!.user!.name!, vote: vote });
+    const search = postState?.votes?.find((x) => x.uid === session!.user!.uid);
+    if (!search) votes.push({ uid: session!.user!.uid!, vote: vote });
     else {
-      votes = votes.filter((x) => x.username !== session!.user!.name!);
+      votes = votes.filter((x) => x.uid !== session!.user!.uid!);
     }
 
-    const res = await axios.put(`/api/post?action=vote&_id=${post._id}`, {
+    await axios.put(`/api/post?action=vote&_id=${post._id}`, {
       votes,
     });
 
@@ -56,7 +58,7 @@ const Post = ({ post }: { post: PostType }) => {
           onClick={() => handleVotePost(true)}
           className={`rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5 hover:text-orange-600 ${
             postState.votes.find(
-              (x) => x.username === session?.user?.name && x.vote === true
+              (x) => x.uid === session?.user?.uid && x.vote === true
             ) && "text-orange-600"
           }`}
         >
@@ -72,7 +74,7 @@ const Post = ({ post }: { post: PostType }) => {
           onClick={() => handleVotePost(false)}
           className={`rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5 hover:text-blue-600 ${
             postState.votes.find(
-              (x) => x.username === session?.user?.name && x.vote === false
+              (x) => x.uid === session?.user?.uid && x.vote === false
             ) && "text-blue-600"
           }`}
         >
@@ -95,7 +97,7 @@ const Post = ({ post }: { post: PostType }) => {
             <span className="mx-1">• Posted by u/{postState?.username}</span>
             <span>{<TimeAgo date={postState?.createdAt} />}</span>
           </div>
-          {postState?.username === session?.user?.name && (
+          {postState?.uid === session?.user?.uid && (
             <div className="ml-auto relative select-none">
               <div
                 ref={menuRef}
