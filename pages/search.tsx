@@ -16,7 +16,7 @@ export const getServerSideProps = async (ctx: any) => {
       `${process.env.NEXTAUTH_URL}api/community`
     );
     return {
-      props: { posts: postsRes.data, communities: communitiesRes },
+      props: { posts: postsRes.data, communities: communitiesRes.data },
     };
   } catch (error) {
     console.log(error);
