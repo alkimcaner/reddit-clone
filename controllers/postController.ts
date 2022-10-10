@@ -82,7 +82,7 @@ export const deleteComment = async (
     }
     await connectMongo();
     const post = await Post.findOne({ "comments._id": req.query._id });
-    if (session.user.uid !== post.uid) {
+    if (session.user.uid !== post.comments.id(req.query._id).uid) {
       return res.status(401).json({ message: "Authorization error" });
     }
     post.comments.id(req.query._id).remove();
