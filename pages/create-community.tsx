@@ -8,6 +8,7 @@ import { useSession } from "next-auth/react";
 import HomeWidget from "../components/HomeWidget";
 import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
+import { CommunityType } from "../types/community";
 
 export const getServerSideProps = async (ctx: any) => {
   //Redirect to homepage if not logged in
@@ -18,10 +19,24 @@ export const getServerSideProps = async (ctx: any) => {
   );
   if (!session) return { redirect: { destination: "/" } };
 
-  return { props: {} };
+  try {
+    const communitiesRes = await axios.get(
+      `${process.env.NEXTAUTH_URL}api/community`
+    );
+    return {
+      props: { communities: communitiesRes.data },
+    };
+  } catch (error) {
+    console.log(error);
+    return { props: {} };
+  }
 };
 
-const CreateCommunity: NextPage = () => {
+interface IProps {
+  communities: CommunityType[];
+}
+
+const CreateCommunity: NextPage<IProps> = ({ communities }) => {
   const router = useRouter();
   const { data: session } = useSession();
   const nameRef = useRef<HTMLInputElement>(null);
@@ -35,7 +50,7 @@ const CreateCommunity: NextPage = () => {
         return;
       }
 
-      const response = await axios.post("api/community", {
+      await axios.post("api/community", {
         name: nameRef.current.value,
         about: aboutRef.current.value,
       });
@@ -54,7 +69,7 @@ const CreateCommunity: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar communities={communities} />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">

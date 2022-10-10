@@ -2,42 +2,48 @@ import axios from "axios";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import React from "react";
+import React, { useMemo } from "react";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
 import Post from "../../../components/Post";
 import { CommunityType } from "../../../types/community";
 import { PostType } from "../../../types/post";
 import subredditLogo from "../../../public/assets/subredditLogo.png";
+import { useRouter } from "next/router";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const communityRes = await axios.get(
-      encodeURI(
-        `${process.env.NEXTAUTH_URL}api/community?name=${ctx.query?.community}`
-      )
+    const communitiesRes = await axios.get(
+      `${process.env.NEXTAUTH_URL}api/community`
     );
-    const community = communityRes.data[0];
-    if (!community) return { redirect: { destination: "/" } };
 
     const postsRes = await axios.get(
       encodeURI(
         `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}`
       )
     );
-    const posts = postsRes.data;
 
-    return { props: { community, posts } };
+    return {
+      props: { communities: communitiesRes.data, posts: postsRes.data },
+    };
   } catch (error) {
     console.log(error);
     return { props: {} };
   }
 };
 
-const Community: NextPage<{
-  community: CommunityType;
+interface IProps {
+  communities: CommunityType[];
   posts: PostType[];
-}> = ({ community, posts }) => {
+}
+
+const Community: NextPage<IProps> = ({ communities, posts }) => {
+  const router = useRouter();
+  const community = useMemo(
+    () => communities.find((x) => x.name === router.query.community)!,
+    [router.query.community]
+  );
+
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -46,7 +52,7 @@ const Community: NextPage<{
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar communities={communities} />
 
       <div className="bg-neutral-900 p-4">
         <div className="max-w-5xl mx-auto flex gap-4 items-center">

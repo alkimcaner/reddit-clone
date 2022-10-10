@@ -21,12 +21,11 @@ export const getServerSideProps = async (ctx: any) => {
   if (!session) return { redirect: { destination: "/" } };
 
   try {
-    const response = await axios.get(
+    const communitiesRes = await axios.get(
       `${process.env.NEXTAUTH_URL}api/community`
     );
-    const communities = response.data;
     return {
-      props: { communities },
+      props: { communities: communitiesRes.data },
     };
   } catch (error) {
     console.log(error);
@@ -34,9 +33,11 @@ export const getServerSideProps = async (ctx: any) => {
   }
 };
 
-const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
-  communities,
-}) => {
+interface IProps {
+  communities: CommunityType[];
+}
+
+const CreatePost: NextPage<IProps> = ({ communities }) => {
   const router = useRouter();
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
   const [community, setCommunity] = useState<string>();
@@ -72,7 +73,7 @@ const CreatePost: NextPage<{ communities: CommunityType[] }> = ({
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar communities={communities} />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">

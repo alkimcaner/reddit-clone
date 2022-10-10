@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useSession, signIn, signOut } from "next-auth/react";
 import Image from "next/image";
 import Link from "next/link";
@@ -9,32 +9,22 @@ import { BsBookmark } from "react-icons/bs";
 import { BiLogOut } from "react-icons/bi";
 import useClickOutside from "../hooks/useClickOutside";
 import { useRouter } from "next/router";
-import axios from "axios";
 import { CommunityType } from "../types/community";
 
-const Navbar = () => {
+interface IProps {
+  communities: CommunityType[];
+}
+
+const Navbar = ({ communities }: IProps) => {
   const { data: session } = useSession();
   const router = useRouter();
   const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
-  const [communityList, setCommunityList] = useState<CommunityType[]>([]);
 
   const handleSearch = (event: any) => {
     event.preventDefault();
     router.push(`/search?q=${event.target.firstChild.value}`);
   };
-
-  useEffect(() => {
-    const handleGetCommunityList = async () => {
-      try {
-        const response = await axios.get("/api/community");
-        setCommunityList(response.data);
-      } catch (error) {
-        console.log(error);
-      }
-    };
-    handleGetCommunityList();
-  }, []);
 
   return (
     <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-neutral-300 flex gap-4 items-center px-4 border-b border-neutral-700">
@@ -79,7 +69,7 @@ const Navbar = () => {
                 </a>
               </Link>
             )}
-            {communityList.map((community) => (
+            {communities?.map((community) => (
               <Link key={community._id} href={`/r/${community.name}`}>
                 <a className="py-2 px-4 hover:bg-neutral-800">
                   {community.name}

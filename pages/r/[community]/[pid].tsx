@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import Comment from "../../../components/Comment";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
@@ -13,46 +13,46 @@ import { PostType } from "../../../types/post";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const communityRes = await axios.get(
-      encodeURI(
-        `${process.env.NEXTAUTH_URL}api/community?name=${ctx.query?.community}`
-      )
+    const communitiesRes = await axios.get(
+      `${process.env.NEXTAUTH_URL}api/community`
     );
-    const community = communityRes.data[0];
-
-    if (!community) return { redirect: { destination: "/" } };
 
     const postRes = await axios.get(
       encodeURI(
         `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
       )
     );
-    const post = postRes.data[0];
 
-    if (!post) return { redirect: { destination: "/" } };
-
-    return { props: { community, post } };
+    return {
+      props: { communities: communitiesRes.data, post: postRes.data[0] },
+    };
   } catch (error) {
     console.log(error);
     return { props: {} };
   }
 };
 
-const Community: NextPage<{
-  community: CommunityType;
+interface IProps {
+  communities: CommunityType[];
   post: PostType;
-}> = ({ community, post }) => {
+}
+
+const Community: NextPage<IProps> = ({ communities, post }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [comments, setComments] = useState<PostType["comments"]>();
   const commentRef = useRef<HTMLTextAreaElement>(null);
+  const community = useMemo(
+    () => communities.find((x) => x.name === router.query.community)!,
+    [router.query.community]
+  );
 
   const handleCommentPost = async () => {
     if (!post || !session) return;
 
     const content = commentRef?.current?.value;
 
-    const res = await axios.put(`/api/post?action=comment&_id=${post._id}`, {
+    await axios.put(`/api/post?action=comment&_id=${post._id}`, {
       content,
     });
 
@@ -71,7 +71,7 @@ const Community: NextPage<{
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar communities={communities} />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">

@@ -1,19 +1,22 @@
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import HomeWidget from "../../components/HomeWidget";
-import Navbar from "../../components/Navbar";
-import Post from "../../components/Post";
-import { PostType } from "../../types/post";
+import HomeWidget from "../components/HomeWidget";
+import Navbar from "../components/Navbar";
+import Post from "../components/Post";
+import { CommunityType } from "../types/community";
+import { PostType } from "../types/post";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const response = await axios.get(
+    const postsRes = await axios.get(
       `${process.env.NEXTAUTH_URL}api/post?q=${ctx.query?.q}`
     );
-    const postsData: PostType[] = response.data;
+    const communitiesRes = await axios.get(
+      `${process.env.NEXTAUTH_URL}api/community`
+    );
     return {
-      props: { postsData },
+      props: { posts: postsRes.data, communities: communitiesRes },
     };
   } catch (error) {
     console.log(error);
@@ -21,7 +24,12 @@ export const getServerSideProps = async (ctx: any) => {
   }
 };
 
-const Home: NextPage<{ postsData: PostType[] }> = ({ postsData }) => {
+interface IProps {
+  posts: PostType[];
+  communities: CommunityType[];
+}
+
+const Home: NextPage<IProps> = ({ posts, communities }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -30,12 +38,12 @@ const Home: NextPage<{ postsData: PostType[] }> = ({ postsData }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar />
+      <Navbar communities={communities} />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {postsData.length ? (
-            postsData?.map((post) => <Post key={post._id} post={post} />)
+          {posts?.length ? (
+            posts?.map((post) => <Post key={post._id} post={post} />)
           ) : (
             <p className="text-neutral-500 text-lg text-center mb-4">
               There are no posts
