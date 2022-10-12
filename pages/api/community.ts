@@ -4,11 +4,14 @@ import {
   createCommunity,
   deleteCommunity,
 } from "../../controllers/communityController";
+import { connectMongo } from "../../utils/mongodb";
 
 const handler: NextApiHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
+  await connectMongo();
+
   switch (req.method) {
     case "GET":
       await getCommunity(req, res);

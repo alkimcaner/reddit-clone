@@ -24,6 +24,7 @@ export const getServerSideProps = async (ctx: any) => {
     const communitiesRes = await axios.get(
       `${process.env.NEXTAUTH_URL}api/community`
     );
+
     return {
       props: { communities: communitiesRes.data },
     };
@@ -45,7 +46,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
   const textRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
 
-  const handlePost = async (event: MouseEvent<HTMLButtonElement>) => {
+  const handleCreatePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
     try {
       if (!titleRef.current?.value || !textRef.current?.value || !community) {
@@ -59,7 +60,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
         content: textRef.current.value,
       });
 
-      router.push("/");
+      router.push(`/r/${community}/${response.data._id}`);
     } catch (error) {
       console.log(error);
     }
@@ -121,7 +122,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
             </div>
             <div className="flex justify-end">
               <button
-                onClick={handlePost}
+                onClick={handleCreatePost}
                 className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
               >
                 Post

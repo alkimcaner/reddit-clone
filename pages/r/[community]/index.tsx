@@ -2,48 +2,51 @@ import axios from "axios";
 import { NextPage } from "next";
 import Head from "next/head";
 import Image from "next/image";
-import React, { useMemo } from "react";
+import React from "react";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
 import Post from "../../../components/Post";
 import { CommunityType } from "../../../types/community";
 import { PostType } from "../../../types/post";
 import subredditLogo from "../../../public/assets/subredditLogo.png";
-import { useRouter } from "next/router";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const communitiesRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/community`
+    const [postsRes, communitiesRes] = await Promise.all([
+      axios.get(
+        encodeURI(
+          `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}`
+        )
+      ),
+      await axios.get(`${process.env.NEXTAUTH_URL}api/community`),
+    ]);
+
+    const community = communitiesRes.data.find(
+      (x: any) => x.name === ctx.query?.community
     );
 
-    const postsRes = await axios.get(
-      encodeURI(
-        `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}`
-      )
-    );
+    if (!community) return { redirect: { destination: "/" } };
 
     return {
-      props: { communities: communitiesRes.data, posts: postsRes.data },
+      props: {
+        posts: postsRes.data,
+        communities: communitiesRes.data,
+        community,
+      },
     };
   } catch (error) {
     console.log(error);
-    return { props: {} };
+    return { props: {}, redirect: { destination: "/" } };
   }
 };
 
 interface IProps {
   communities: CommunityType[];
+  community: CommunityType;
   posts: PostType[];
 }
 
-const Community: NextPage<IProps> = ({ communities, posts }) => {
-  const router = useRouter();
-  const community = useMemo(
-    () => communities.find((x) => x.name === router.query.community)!,
-    [router.query.community]
-  );
-
+const Community: NextPage<IProps> = ({ posts, communities, community }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>

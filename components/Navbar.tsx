@@ -24,6 +24,7 @@ const Navbar = ({ communities }: IProps) => {
   const handleSearch = (event: any) => {
     event.preventDefault();
     router.push(`/search?q=${event.target.firstChild.value}`);
+    event.target.firstChild.value = "";
   };
 
   return (
@@ -82,7 +83,7 @@ const Navbar = ({ communities }: IProps) => {
       {/* Search */}
       <div className="group focus-within:ring-neutral-200 mr-auto px-4 py-2 hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-full ring-1 ring-neutral-700 w-[48rem]">
         <AiOutlineSearch className="text-2xl" />
-        <form onSubmit={handleSearch}>
+        <form onSubmit={handleSearch} className="w-full">
           <input
             className="bg-transparent outline-none text-neutral-200 placeholder-neutral-500 text-sm w-full"
             placeholder="Search Reddit"

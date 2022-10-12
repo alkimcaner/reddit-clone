@@ -3,7 +3,7 @@ import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Comment from "../../../components/Comment";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
@@ -13,39 +13,46 @@ import { PostType } from "../../../types/post";
 
 export const getServerSideProps = async (ctx: any) => {
   try {
-    const communitiesRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/community`
+    const [postRes, communitiesRes] = await Promise.all([
+      axios.get(
+        encodeURI(
+          `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
+        )
+      ),
+      axios.get(`${process.env.NEXTAUTH_URL}api/community`),
+    ]);
+
+    const community = communitiesRes.data.find(
+      (x: any) => x.name === ctx.query?.community
     );
 
-    const postRes = await axios.get(
-      encodeURI(
-        `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
-      )
-    );
+    if (!community || !postRes.data[0])
+      return { redirect: { destination: "/" } };
 
     return {
-      props: { communities: communitiesRes.data, post: postRes.data[0] },
+      props: {
+        post: postRes.data[0],
+        communities: communitiesRes.data,
+        community,
+      },
     };
   } catch (error) {
     console.log(error);
-    return { props: {} };
+    return { props: {}, redirect: { destination: "/" } };
   }
 };
 
 interface IProps {
   communities: CommunityType[];
+  community: CommunityType;
   post: PostType;
 }
 
-const Community: NextPage<IProps> = ({ communities, post }) => {
+const Community: NextPage<IProps> = ({ post, communities, community }) => {
   const { data: session } = useSession();
   const router = useRouter();
   const [comments, setComments] = useState<PostType["comments"]>();
   const commentRef = useRef<HTMLTextAreaElement>(null);
-  const community = useMemo(
-    () => communities.find((x) => x.name === router.query.community)!,
-    [router.query.community]
-  );
 
   const handleCommentPost = async () => {
     if (!post || !session) return;

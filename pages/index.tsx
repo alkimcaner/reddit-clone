@@ -9,10 +9,11 @@ import { PostType } from "../types/post";
 
 export const getServerSideProps = async () => {
   try {
-    const postsRes = await axios.get(`${process.env.NEXTAUTH_URL}api/post`);
-    const communitiesRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/community`
-    );
+    const [postsRes, communitiesRes] = await Promise.all([
+      axios.get(`${process.env.NEXTAUTH_URL}api/post`),
+      axios.get(`${process.env.NEXTAUTH_URL}api/community`),
+    ]);
+
     return {
       props: { posts: postsRes.data, communities: communitiesRes.data },
     };

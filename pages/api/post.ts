@@ -8,11 +8,14 @@ import {
   commentPost,
   searchPost,
 } from "../../controllers/postController";
+import { connectMongo } from "../../utils/mongodb";
 
 const handler: NextApiHandler = async (
   req: NextApiRequest,
   res: NextApiResponse
 ) => {
+  await connectMongo();
+
   switch (req.method) {
     case "GET":
       if (req.query.q) await searchPost(req, res);
@@ -23,7 +26,7 @@ const handler: NextApiHandler = async (
       break;
     case "DELETE":
       if (req.query.type === "post") await deletePost(req, res);
-      if (req.query.type === "comment") await deleteComment(req, res);
+      else if (req.query.type === "comment") await deleteComment(req, res);
       else res.status(400).end();
       break;
     case "PUT":

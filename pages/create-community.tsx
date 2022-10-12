@@ -4,7 +4,6 @@ import Navbar from "../components/Navbar";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import axios from "axios";
-import { useSession } from "next-auth/react";
 import HomeWidget from "../components/HomeWidget";
 import { unstable_getServerSession } from "next-auth";
 import { authOptions } from "./api/auth/[...nextauth]";
@@ -23,6 +22,7 @@ export const getServerSideProps = async (ctx: any) => {
     const communitiesRes = await axios.get(
       `${process.env.NEXTAUTH_URL}api/community`
     );
+
     return {
       props: { communities: communitiesRes.data },
     };
@@ -38,7 +38,6 @@ interface IProps {
 
 const CreateCommunity: NextPage<IProps> = ({ communities }) => {
   const router = useRouter();
-  const { data: session } = useSession();
   const nameRef = useRef<HTMLInputElement>(null);
   const aboutRef = useRef<HTMLTextAreaElement>(null);
 
@@ -55,7 +54,7 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
         about: aboutRef.current.value,
       });
 
-      router.push("/");
+      router.push(`/r/${nameRef.current.value}`);
     } catch (error) {
       console.log(error);
     }
