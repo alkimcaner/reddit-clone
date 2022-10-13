@@ -7,6 +7,7 @@ import {
   votePost,
   commentPost,
   searchPost,
+  savePost,
 } from "../../controllers/postController";
 import { connectMongo } from "../../utils/mongodb";
 
@@ -27,12 +28,13 @@ const handler: NextApiHandler = async (
     case "DELETE":
       if (req.query.type === "post") await deletePost(req, res);
       else if (req.query.type === "comment") await deleteComment(req, res);
-      else res.status(400).end();
+      else return res.status(400).json({ message: "Invalid request" });
       break;
     case "PUT":
       if (req.query.action === "vote") await votePost(req, res);
       else if (req.query.action === "comment") await commentPost(req, res);
-      else res.status(400).end();
+      else if (req.query.action === "save") await savePost(req, res);
+      else return res.status(400).json({ message: "Invalid request" });
       break;
     default:
       return res.status(400).json({ message: "Invalid request" });

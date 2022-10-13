@@ -20,6 +20,7 @@ const postSchema = new Schema(
     content: { type: String, required: true },
     comments: [commentSchema],
     votes: { type: [{ uid: String, vote: Boolean }], required: true },
+    saved: { type: [String], required: true },
   },
   { timestamps: true }
 );

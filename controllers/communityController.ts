@@ -56,6 +56,7 @@ export const deleteCommunity = async (
 
     const community = await Community.findById(req.query._id);
 
+    //Check if the user is authorized
     if (session.user.uid !== community.uid) {
       return res.status(401).json({ message: "Authorization error" });
     }

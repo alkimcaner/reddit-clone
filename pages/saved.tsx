@@ -1,16 +1,28 @@
 import axios from "axios";
 import type { NextPage } from "next";
+import { unstable_getServerSession } from "next-auth";
 import Head from "next/head";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
 import { CommunityType } from "../types/community";
 import { PostType } from "../types/post";
+import { authOptions } from "./api/auth/[...nextauth]";
 
-export const getServerSideProps = async () => {
+export const getServerSideProps = async (ctx: any) => {
+  //Redirect to homepage if not logged in
+  const session = await unstable_getServerSession(
+    ctx.req,
+    ctx.res,
+    authOptions
+  );
+  if (!session) return { redirect: { destination: "/" } };
+
   try {
     const [postsRes, communitiesRes] = await Promise.all([
-      axios.get(`${process.env.NEXTAUTH_URL}api/post`),
+      axios.get(
+        `${process.env.NEXTAUTH_URL}api/post?saved=${session.user.uid}`
+      ),
       axios.get(`${process.env.NEXTAUTH_URL}api/community`),
     ]);
 
@@ -45,7 +57,7 @@ const Home: NextPage<IProps> = ({ posts, communities }) => {
             posts?.map((post) => <Post key={post._id} post={post} />)
           ) : (
             <p className="text-neutral-500 text-lg text-center mb-4">
-              There are no posts
+              There are no saved posts
             </p>
           )}
         </section>

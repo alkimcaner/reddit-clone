@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { GoArrowUp, GoArrowDown, GoComment } from "react-icons/go";
-import { BsBookmark, BsTrash } from "react-icons/bs";
+import { BsBookmark, BsBookmarkFill, BsTrash } from "react-icons/bs";
 import { CgMoreO } from "react-icons/cg";
 import TimeAgo from "react-timeago";
 import { PostType } from "../types/post";
@@ -20,6 +20,7 @@ const Post = ({ post }: IProps) => {
   const { data: session } = useSession();
   const [postState, setPostState] = useState<PostType | null>();
   const [isMenuVisible, setMenuVisible] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
   const menuRef = useClickOutside(() => setMenuVisible(false));
 
   const handleDeletePost = async () => {
@@ -47,7 +48,18 @@ const Post = ({ post }: IProps) => {
     });
   };
 
-  useEffect(() => setPostState(post), [post]);
+  const handleSavePost = async () => {
+    if (!postState || !session) return;
+
+    await axios.put(`/api/post?action=save&_id=${post._id}`);
+
+    setIsSaved((prev) => !prev);
+  };
+
+  useEffect(() => {
+    setPostState(post);
+    if (post.saved.find((x) => x === session?.user.uid)) setIsSaved(true);
+  }, [post]);
 
   if (!postState) return <></>;
 
@@ -133,8 +145,15 @@ const Post = ({ post }: IProps) => {
               {postState?.comments?.length} comments
             </a>
           </Link>
-          <button className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5">
-            <BsBookmark className="text-lg" />
+          <button
+            onClick={handleSavePost}
+            className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5"
+          >
+            {isSaved ? (
+              <BsBookmarkFill className="text-lg" />
+            ) : (
+              <BsBookmark className="text-lg" />
+            )}
             Save
           </button>
         </div>

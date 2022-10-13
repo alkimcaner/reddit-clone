@@ -55,7 +55,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
       }
 
       const response = await axios.post("api/post", {
-        community: community,
+        community,
         title: titleRef.current.value,
         content: textRef.current.value,
       });

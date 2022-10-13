@@ -47,6 +47,7 @@ export const createPost = async (req: NextApiRequest, res: NextApiResponse) => {
       content,
       comments: [],
       vote: [],
+      saved: [],
     });
 
     return res.status(200).json(post);
@@ -65,6 +66,7 @@ export const deletePost = async (req: NextApiRequest, res: NextApiResponse) => {
 
     const post = await Post.findById(req.query._id);
 
+    //Check if the user is authorized
     if (session.user.uid !== post.uid) {
       return res.status(401).json({ message: "Authorization error" });
     }
@@ -90,6 +92,7 @@ export const deleteComment = async (
 
     const post = await Post.findOne({ "comments._id": req.query._id });
 
+    //Check if the user is authorized
     if (session.user.uid !== post.comments.id(req.query._id).uid) {
       return res.status(401).json({ message: "Authorization error" });
     }
@@ -143,6 +146,31 @@ export const commentPost = async (
       content,
     });
     post.markModified("comments");
+    await post.save();
+
+    return res.status(200).json(post);
+  } catch (error: any) {
+    return res.status(400).json({ message: error.message });
+  }
+};
+
+export const savePost = async (req: NextApiRequest, res: NextApiResponse) => {
+  try {
+    const session = await unstable_getServerSession(req, res, authOptions);
+
+    if (!session) {
+      return res.status(401).json({ message: "Authentication error" });
+    }
+
+    const post = await Post.findById(req.query._id);
+
+    if (post.saved.find((x: string) => x === session.user.uid)) {
+      post.saved = post.saved.filter((x: string) => x !== session.user.uid);
+    } else {
+      post.saved.push(session.user.uid);
+    }
+
+    post.markModified("saved");
     await post.save();
 
     return res.status(200).json(post);

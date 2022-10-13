@@ -27,6 +27,16 @@ const Navbar = ({ communities }: IProps) => {
     event.target.firstChild.value = "";
   };
 
+  const PageName = () => {
+    if (router.query.community) return <span>r/{router.query.community}</span>;
+    else if (router.pathname === "/saved") return <span>Saved Posts</span>;
+    else if (router.pathname === "/create-post")
+      return <span>Create Post</span>;
+    else if (router.pathname === "/create-community")
+      return <span>Create Community</span>;
+    else return <span>Home</span>;
+  };
+
   return (
     <nav className="sticky top-0 z-50 h-12 bg-neutral-900 text-neutral-300 flex gap-4 items-center px-4 border-b border-neutral-700">
       {/* Home */}
@@ -49,11 +59,7 @@ const Navbar = ({ communities }: IProps) => {
         >
           <AiFillHome className="text-2xl" />
           <span className="text-sm hidden md:inline">
-            {router.query.community ? (
-              <span>r/{router.query.community}</span>
-            ) : (
-              <span>Home</span>
-            )}
+            <PageName />
           </span>
           <MdKeyboardArrowDown className="ml-auto" />
         </div>
@@ -81,7 +87,7 @@ const Navbar = ({ communities }: IProps) => {
         )}
       </div>
       {/* Search */}
-      <div className="group focus-within:ring-neutral-200 mr-auto px-4 py-2 hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-full ring-1 ring-neutral-700 w-[48rem]">
+      <div className="group focus-within:ring-neutral-200 mr-auto px-4 py-[0.4rem] hidden lg:flex gap-2 bg-neutral-800 text-neutral-500 rounded-full ring-1 ring-neutral-700 w-[48rem]">
         <AiOutlineSearch className="text-2xl" />
         <form onSubmit={handleSearch} className="w-full">
           <input
@@ -93,9 +99,11 @@ const Navbar = ({ communities }: IProps) => {
       {/* Menu */}
       {session && (
         <div className="flex gap-1 items-center text-xl">
-          <div className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
-            <BsBookmark />
-          </div>
+          <Link href="/saved">
+            <a className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
+              <BsBookmark />
+            </a>
+          </Link>
           <Link href="/create-post">
             <a className="p-2 rounded-sm cursor-pointer hover:bg-neutral-800">
               <AiOutlinePlus />

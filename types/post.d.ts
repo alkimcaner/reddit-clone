@@ -15,6 +15,7 @@ export interface PostType {
     createdAt: Date;
   }[];
   votes: { uid: string; vote: boolean }[];
+  saved: string[];
   createdAt: Date;
   updatedAt: Date;
 }
