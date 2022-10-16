@@ -53,17 +53,21 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
   const router = useRouter();
   const [comments, setComments] = useState<PostType["comments"]>();
   const commentRef = useRef<HTMLTextAreaElement>(null);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const handleCommentPost = async () => {
     if (!post || !session) return;
+    setButtonDisabled(true);
 
-    const content = commentRef?.current?.value;
-
-    await axios.put(`/api/post?action=comment&_id=${post._id}`, {
-      content,
-    });
-
-    router.reload();
+    try {
+      const content = commentRef?.current?.value;
+      await axios.put(`/api/post?action=comment&_id=${post._id}`, {
+        content,
+      });
+      router.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -96,6 +100,7 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
 
               <div className="flex justify-end">
                 <button
+                  disabled={buttonDisabled}
                   onClick={handleCommentPost}
                   className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
                 >
@@ -110,7 +115,7 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
           </h1>
 
           {comments?.length ? (
-            <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-2">
+            <div className="bg-neutral-900 rounded-md flex flex-col divide-y divide-neutral-800">
               {comments.map((comment) => (
                 <Comment key={comment._id} comment={comment} />
               ))}

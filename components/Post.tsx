@@ -24,36 +24,52 @@ const Post = ({ post }: IProps) => {
   const menuRef = useClickOutside(() => setMenuVisible(false));
 
   const handleDeletePost = async () => {
-    if (!session || postState?.uid !== session?.user?.uid) return;
-    await axios.delete(`/api/post?type=post&_id=${post._id}`);
-    router.reload();
+    if (!session || post?.uid !== session?.user?.uid) return;
+
+    try {
+      await axios.delete(`/api/post?type=post&_id=${post._id}`);
+      router.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   const handleVotePost = async (vote: boolean) => {
     if (!postState || !session) return;
-    let votes = postState.votes;
 
-    const search = postState?.votes?.find((x) => x.uid === session!.user!.uid);
-    if (!search) votes.push({ uid: session!.user!.uid!, vote: vote });
-    else {
-      votes = votes.filter((x) => x.uid !== session!.user!.uid!);
+    try {
+      let votes = postState.votes;
+      const search = postState?.votes?.find(
+        (x) => x.uid === session!.user!.uid
+      );
+
+      if (!search) {
+        votes.push({ uid: session!.user!.uid!, vote: vote });
+      } else {
+        votes = votes.filter((x) => x.uid !== session!.user!.uid!);
+      }
+
+      await axios.put(`/api/post?action=vote&_id=${post._id}`, {
+        votes,
+      });
+
+      setPostState((prev) => {
+        return { ...prev!, votes };
+      });
+    } catch (error) {
+      console.log(error);
     }
-
-    await axios.put(`/api/post?action=vote&_id=${post._id}`, {
-      votes,
-    });
-
-    setPostState((prev) => {
-      return { ...prev!, votes };
-    });
   };
 
   const handleSavePost = async () => {
-    if (!postState || !session) return;
+    if (!session) return;
 
-    await axios.put(`/api/post?action=save&_id=${post._id}`);
-
-    setIsSaved((prev) => !prev);
+    try {
+      await axios.put(`/api/post?action=save&_id=${post._id}`);
+      setIsSaved((prev) => !prev);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   useEffect(() => {
@@ -68,6 +84,7 @@ const Post = ({ post }: IProps) => {
       <div className="p-2 w-10 bg-black bg-opacity-20 text-xl flex flex-col items-center gap-2">
         <button
           onClick={() => handleVotePost(true)}
+          disabled={session ? false : true}
           className={`rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5 hover:text-orange-600 ${
             postState.votes.find(
               (x) => x.uid === session?.user?.uid && x.vote === true
@@ -84,6 +101,7 @@ const Post = ({ post }: IProps) => {
         </div>
         <button
           onClick={() => handleVotePost(false)}
+          disabled={session ? false : true}
           className={`rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5 hover:text-blue-600 ${
             postState.votes.find(
               (x) => x.uid === session?.user?.uid && x.vote === false
@@ -93,8 +111,8 @@ const Post = ({ post }: IProps) => {
           <GoArrowDown />
         </button>
       </div>
-      <div className="p-2 flex flex-col gap-2 w-full">
-        <div className="text-xs flex items-center">
+      <div className="flex flex-col gap-2 w-full">
+        <div className="text-xs flex items-center px-2 pt-2">
           {postState.userImage && (
             <div className="relative w-6 h-6 overflow-hidden rounded-full mr-2">
               <Image src={postState.userImage} alt="" layout="fill" />
@@ -119,25 +137,27 @@ const Post = ({ post }: IProps) => {
                 <CgMoreO />
               </div>
               {isMenuVisible && (
-                <div className="absolute bg-neutral-900 border border-neutral-700 rounded-md overflow-hidden right-0 top-8 z-10 cursor-pointer shadow-md shadow-black">
-                  <div
+                <div className="absolute bg-neutral-900 border border-neutral-700 rounded-md overflow-hidden right-0 top-6 z-10 cursor-pointer shadow-md shadow-black">
+                  <button
                     onClick={handleDeletePost}
                     className="hover:bg-neutral-700 p-2 flex gap-1 items-center text-red-500"
                   >
                     <BsTrash />
                     Delete
-                  </div>
+                  </button>
                 </div>
               )}
             </div>
           )}
         </div>
-        <Link href={`/r/${postState.community}/${postState._id}`}>
-          <a className="w-fit font-semibold text-lg hover:underline">
-            {postState?.title}
-          </a>
-        </Link>
-        <div>{postState?.content}</div>
+        <div className="px-2 flex flex-col gap-2">
+          <Link href={`/r/${postState.community}/${postState._id}`}>
+            <a className="w-fit font-semibold text-lg hover:underline">
+              {postState?.title}
+            </a>
+          </Link>
+          <div>{postState?.content}</div>
+        </div>
         <div className="flex text-neutral-500 font-medium text-sm">
           <Link href={`/r/${postState.community}/${postState._id}`}>
             <a className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5">
@@ -145,17 +165,19 @@ const Post = ({ post }: IProps) => {
               {postState?.comments?.length} comments
             </a>
           </Link>
-          <button
-            onClick={handleSavePost}
-            className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5"
-          >
-            {isSaved ? (
-              <BsBookmarkFill className="text-lg" />
-            ) : (
-              <BsBookmark className="text-lg" />
-            )}
-            Save
-          </button>
+          {session && (
+            <button
+              onClick={handleSavePost}
+              className="flex items-center gap-2 p-2 rounded-sm bg-white bg-opacity-0 hover:bg-opacity-5"
+            >
+              {isSaved ? (
+                <BsBookmarkFill className="text-lg" />
+              ) : (
+                <BsBookmark className="text-lg" />
+              )}
+              Save
+            </button>
+          )}
         </div>
       </div>
     </div>

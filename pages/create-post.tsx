@@ -45,21 +45,22 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
   const titleRef = useRef<HTMLInputElement>(null);
   const textRef = useRef<HTMLTextAreaElement>(null);
   const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const handleCreatePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    try {
-      if (!titleRef.current?.value || !textRef.current?.value || !community) {
-        alert("Please fill in the blanks");
-        return;
-      }
+    if (!titleRef.current?.value || !textRef.current?.value || !community) {
+      alert("Please fill in the blanks");
+      return;
+    }
+    setButtonDisabled(true);
 
+    try {
       const response = await axios.post("api/post", {
         community,
         title: titleRef.current.value,
         content: textRef.current.value,
       });
-
       router.push(`/r/${community}/${response.data._id}`);
     } catch (error) {
       console.log(error);
@@ -122,6 +123,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
             </div>
             <div className="flex justify-end">
               <button
+                disabled={buttonDisabled}
                 onClick={handleCreatePost}
                 className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
               >

@@ -21,12 +21,17 @@ const Comment = ({ comment }: IProps) => {
 
   const handleDeleteComment = async () => {
     if (!session || comment?.uid !== session?.user?.uid) return;
-    await axios.delete(`/api/post?type=comment&_id=${comment._id}`);
-    router.reload();
+
+    try {
+      await axios.delete(`/api/post?type=comment&_id=${comment._id}`);
+      router.reload();
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (
-    <div className="p-2 flex flex-col gap-4 w-full">
+    <div className="p-4 flex flex-col gap-2 w-full">
       <div className="text-xs flex items-center">
         {comment.userImage && (
           <div className="relative w-6 h-6 overflow-hidden rounded-full mr-2">
@@ -47,14 +52,14 @@ const Comment = ({ comment }: IProps) => {
               <CgMoreO />
             </div>
             {isMenuVisible && (
-              <div className="absolute bg-neutral-900 border border-neutral-700 rounded-md overflow-hidden right-0 top-8 z-10 cursor-pointer shadow-md shadow-black">
-                <div
+              <div className="absolute bg-neutral-900 border border-neutral-700 rounded-md overflow-hidden right-0 top-6 z-10 cursor-pointer shadow-md shadow-black">
+                <button
                   onClick={handleDeleteComment}
                   className="hover:bg-neutral-700 p-2 flex gap-1 items-center text-red-500"
                 >
                   <BsTrash />
                   Delete
-                </div>
+                </button>
               </div>
             )}
           </div>

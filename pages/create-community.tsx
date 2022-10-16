@@ -1,4 +1,4 @@
-import React, { MouseEvent, useRef, useEffect } from "react";
+import React, { MouseEvent, useRef, useEffect, useState } from "react";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { NextPage } from "next";
@@ -40,20 +40,21 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
   const router = useRouter();
   const nameRef = useRef<HTMLInputElement>(null);
   const aboutRef = useRef<HTMLTextAreaElement>(null);
+  const [buttonDisabled, setButtonDisabled] = useState(false);
 
   const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    try {
-      if (!nameRef.current?.value || !aboutRef.current?.value) {
-        alert("Please enter a community name");
-        return;
-      }
+    if (!nameRef.current?.value || !aboutRef.current?.value) {
+      alert("Please enter a community name");
+      return;
+    }
+    setButtonDisabled(true);
 
+    try {
       await axios.post("api/community", {
         name: nameRef.current.value,
         about: aboutRef.current.value,
       });
-
       router.push(`/r/${nameRef.current.value}`);
     } catch (error) {
       console.log(error);
@@ -96,6 +97,7 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
 
             <div className="flex justify-end">
               <button
+                disabled={buttonDisabled}
                 onClick={handleCreate}
                 className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
               >
