@@ -1,46 +1,22 @@
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { NextPage } from "next";
-import { unstable_getServerSession } from "next-auth";
+import { useSession } from "next-auth/react";
 import Head from "next/head";
+import Image from "next/image";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
-import { CommunityType } from "../types/community";
 import { PostType } from "../types/post";
-import { authOptions } from "./api/auth/[...nextauth]";
 
-export const getServerSideProps = async (ctx: any) => {
-  //Redirect to homepage if not logged in
-  const session = await unstable_getServerSession(
-    ctx.req,
-    ctx.res,
-    authOptions
+const Home: NextPage = () => {
+  const { data: session } = useSession();
+  const { data: posts, isLoading } = useQuery<PostType[]>(
+    ["posts", "saved"],
+    () =>
+      axios.get(`/api/post?saved=${session!.user.uid}`).then((res) => res.data),
+    { enabled: !!session }
   );
-  if (!session) return { redirect: { destination: "/" } };
-
-  try {
-    const [postsRes, communitiesRes] = await Promise.all([
-      axios.get(
-        `${process.env.NEXTAUTH_URL}api/post?saved=${session.user.uid}`
-      ),
-      axios.get(`${process.env.NEXTAUTH_URL}api/community`),
-    ]);
-
-    return {
-      props: { posts: postsRes.data, communities: communitiesRes.data },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {}, redirect: { destination: "/404" } };
-  }
-};
-
-interface IProps {
-  posts: PostType[];
-  communities: CommunityType[];
-}
-
-const Home: NextPage<IProps> = ({ posts, communities }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -49,10 +25,19 @@ const Home: NextPage<IProps> = ({ posts, communities }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
+          {isLoading && (
+            <Image
+              src="/assets/loading.svg"
+              alt="loading"
+              width={64}
+              height={64}
+              priority
+            />
+          )}
           {posts?.length ? (
             posts?.map((post) => <Post key={post._id} post={post} />)
           ) : (

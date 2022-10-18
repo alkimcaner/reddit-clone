@@ -1,65 +1,31 @@
-import React, { MouseEvent, useRef, useEffect, useState } from "react";
+import React, { useState } from "react";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { NextPage } from "next";
 import { useRouter } from "next/router";
 import axios from "axios";
 import HomeWidget from "../components/HomeWidget";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
-import { CommunityType } from "../types/community";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-export const getServerSideProps = async (ctx: any) => {
-  //Redirect to homepage if not logged in
-  const session = await unstable_getServerSession(
-    ctx.req,
-    ctx.res,
-    authOptions
-  );
-  if (!session) return { redirect: { destination: "/" } };
-
-  try {
-    const communitiesRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/community`
-    );
-
-    return {
-      props: { communities: communitiesRes.data },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {} };
-  }
-};
-
-interface IProps {
-  communities: CommunityType[];
-}
-
-const CreateCommunity: NextPage<IProps> = ({ communities }) => {
+const CreateCommunity: NextPage = () => {
   const router = useRouter();
-  const nameRef = useRef<HTMLInputElement>(null);
-  const aboutRef = useRef<HTMLTextAreaElement>(null);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
-
-  const handleCreate = async (event: MouseEvent<HTMLButtonElement>) => {
-    event.preventDefault();
-    if (!nameRef.current?.value || !aboutRef.current?.value) {
-      alert("Please enter a community name");
-      return;
+  const [name, setName] = useState("");
+  const [about, setAbout] = useState("");
+  const queryClient = useQueryClient();
+  const mutation = useMutation(
+    (data: { name: string; about: string }) =>
+      axios.post("/api/community", data),
+    {
+      onMutate: () => {
+        setAbout("");
+        setName("");
+      },
+      onSuccess: () => {
+        queryClient.invalidateQueries(["communities"]);
+        router.push(`/r/${name}`);
+      },
     }
-    setButtonDisabled(true);
-
-    try {
-      await axios.post("api/community", {
-        name: nameRef.current.value,
-        about: aboutRef.current.value,
-      });
-      router.push(`/r/${nameRef.current.value}`);
-    } catch (error) {
-      console.log(error);
-    }
-  };
+  );
 
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
@@ -69,7 +35,7 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
@@ -81,7 +47,8 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
             <div className="border border-neutral-700 rounded-md w-full flex items-center gap-1 focus-within:border-white">
               <p className="ml-2">r/</p>
               <input
-                ref={nameRef}
+                value={name}
+                onChange={(event) => setName(event.target.value)}
                 type="text"
                 placeholder="Name"
                 className="bg-transparent py-2 w-full outline-none"
@@ -89,7 +56,8 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
             </div>
             <div className="border border-neutral-700 rounded-md w-full">
               <textarea
-                ref={aboutRef}
+                value={about}
+                onChange={(event) => setAbout(event.target.value)}
                 placeholder="About"
                 className="bg-transparent p-2 w-full min-h-[8rem]"
               />
@@ -97,8 +65,13 @@ const CreateCommunity: NextPage<IProps> = ({ communities }) => {
 
             <div className="flex justify-end">
               <button
-                disabled={buttonDisabled}
-                onClick={handleCreate}
+                onClick={(event) => {
+                  event.preventDefault();
+                  if (!name || !about) {
+                    return alert("Please enter a community name");
+                  }
+                  mutation.mutate({ name, about });
+                }}
                 className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
               >
                 Create Community

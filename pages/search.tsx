@@ -1,34 +1,21 @@
+import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
+import Image from "next/image";
+import { useRouter } from "next/router";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
 import Post from "../components/Post";
-import { CommunityType } from "../types/community";
 import { PostType } from "../types/post";
 
-export const getServerSideProps = async (ctx: any) => {
-  try {
-    const [postsRes, communitiesRes] = await Promise.all([
-      axios.get(`${process.env.NEXTAUTH_URL}api/post?q=${ctx.query?.q}`),
-      axios.get(`${process.env.NEXTAUTH_URL}api/community`),
-    ]);
+const Home: NextPage = () => {
+  const router = useRouter();
+  const { data: posts, isLoading } = useQuery<PostType[]>(
+    ["posts", router.query.q],
+    () => axios.get(`/api/post?q=${router.query.q}`).then((res) => res.data)
+  );
 
-    return {
-      props: { posts: postsRes.data, communities: communitiesRes.data },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {} };
-  }
-};
-
-interface IProps {
-  posts: PostType[];
-  communities: CommunityType[];
-}
-
-const Home: NextPage<IProps> = ({ posts, communities }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -37,10 +24,19 @@ const Home: NextPage<IProps> = ({ posts, communities }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
+          {isLoading && (
+            <Image
+              src="/assets/loading.svg"
+              alt="loading"
+              width={64}
+              height={64}
+              priority
+            />
+          )}
           {posts?.length ? (
             posts?.map((post) => <Post key={post._id} post={post} />)
           ) : (

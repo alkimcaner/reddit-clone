@@ -115,10 +115,15 @@ export const votePost = async (req: NextApiRequest, res: NextApiResponse) => {
       return res.status(401).json({ message: "Authentication error" });
     }
 
-    const { votes } = req.body;
+    const { vote } = req.body;
 
-    const post = await Post.findByIdAndUpdate(req.query._id, { votes });
+    const post = await Post.findById(req.query._id);
+    if (post.votes.find((x: any) => x.uid === session.user.uid))
+      post.votes = post.votes.filter((x: any) => x.uid !== session.user.uid);
+    else post.votes.push({ uid: session.user.uid, vote });
 
+    post.markModified("votes");
+    await post.save();
     return res.status(200).json(post);
   } catch (error: any) {
     return res.status(400).json({ message: error.message });

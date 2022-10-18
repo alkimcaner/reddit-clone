@@ -1,9 +1,11 @@
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import axios from "axios";
 import { NextPage } from "next";
 import { useSession } from "next-auth/react";
 import Head from "next/head";
+import Image from "next/image";
 import { useRouter } from "next/router";
-import React, { useRef, useState, useEffect } from "react";
+import React, { useState } from "react";
 import Comment from "../../../components/Comment";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
@@ -11,68 +13,46 @@ import Post from "../../../components/Post";
 import { CommunityType } from "../../../types/community";
 import { PostType } from "../../../types/post";
 
-export const getServerSideProps = async (ctx: any) => {
-  try {
-    const [postRes, communitiesRes] = await Promise.all([
-      axios.get(
-        encodeURI(
-          `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}&_id=${ctx.query?.pid}`
-        )
-      ),
-      axios.get(`${process.env.NEXTAUTH_URL}api/community`),
-    ]);
-
-    const community = communitiesRes.data.find(
-      (x: any) => x.name === ctx.query?.community
-    );
-
-    if (!community || !postRes.data[0])
-      return { redirect: { destination: "/" } };
-
-    return {
-      props: {
-        post: postRes.data[0],
-        communities: communitiesRes.data,
-        community,
-      },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {}, redirect: { destination: "/" } };
-  }
-};
-
-interface IProps {
-  communities: CommunityType[];
-  community: CommunityType;
-  post: PostType;
-}
-
-const Community: NextPage<IProps> = ({ post, communities, community }) => {
+const Community: NextPage = () => {
   const { data: session } = useSession();
   const router = useRouter();
-  const [comments, setComments] = useState<PostType["comments"]>();
-  const commentRef = useRef<HTMLTextAreaElement>(null);
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const [content, setContent] = useState("");
+  const queryClient = useQueryClient();
 
-  const handleCommentPost = async () => {
-    if (!post || !session) return;
-    setButtonDisabled(true);
+  const { data: post, isLoading } = useQuery<PostType>(
+    ["posts", router.query.community, router.query.pid],
+    () =>
+      axios
+        .get(
+          `/api/post?community=${router.query.community}&_id=${router.query.pid}`
+        )
+        .then((res) => res.data[0])
+  );
 
-    try {
-      const content = commentRef?.current?.value;
-      await axios.put(`/api/post?action=comment&_id=${post._id}`, {
+  const { data: community } = useQuery<CommunityType>(
+    ["community", router.query.community],
+    () =>
+      axios
+        .get(`/api/community?name=${router.query.community}`)
+        .then((res) => res.data[0])
+  );
+
+  const commentMutation = useMutation(
+    () =>
+      axios.put(`/api/post?action=comment&_id=${router.query.pid}`, {
         content,
-      });
-      router.reload();
-    } catch (error) {
-      console.log(error);
+      }),
+    {
+      onSuccess: () => {
+        queryClient.invalidateQueries([
+          "posts",
+          router.query.community,
+          router.query.pid,
+        ]);
+        setContent("");
+      },
     }
-  };
-
-  useEffect(() => {
-    setComments(post.comments);
-  }, []);
+  );
 
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
@@ -82,17 +62,27 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          <Post key={post._id} post={post} />
+          {isLoading && (
+            <Image
+              src="/assets/loading.svg"
+              alt="loading"
+              width={64}
+              height={64}
+              priority
+            />
+          )}
+          {post && <Post key={post._id} post={post} />}
 
           {session && (
             <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
               <div className="border border-neutral-700 rounded-md w-full">
                 <textarea
-                  ref={commentRef}
+                  value={content}
+                  onChange={(event) => setContent(event.target.value)}
                   placeholder="What are your thoughts?"
                   className="bg-transparent p-2 w-full min-h-[8rem]"
                 />
@@ -100,8 +90,12 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
 
               <div className="flex justify-end">
                 <button
-                  disabled={buttonDisabled}
-                  onClick={handleCommentPost}
+                  onClick={() => {
+                    if (!session) return;
+                    if (!content) return alert("Please write a comment");
+
+                    commentMutation.mutate();
+                  }}
                   className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
                 >
                   Comment
@@ -114,11 +108,13 @@ const Community: NextPage<IProps> = ({ post, communities, community }) => {
             Comments
           </h1>
 
-          {comments?.length ? (
+          {post?.comments?.length ? (
             <div className="bg-neutral-900 rounded-md flex flex-col divide-y divide-neutral-800">
-              {comments.map((comment) => (
-                <Comment key={comment._id} comment={comment} />
-              ))}
+              {post.comments
+                .sort((a, b) => (a.createdAt < b.createdAt ? 1 : -1))
+                .map((comment) => (
+                  <Comment key={comment._id} comment={comment} />
+                ))}
             </div>
           ) : (
             <p className="text-neutral-500 text-lg text-center mb-4">

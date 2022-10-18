@@ -10,16 +10,17 @@ import { BiLogOut } from "react-icons/bi";
 import useClickOutside from "../hooks/useClickOutside";
 import { useRouter } from "next/router";
 import { CommunityType } from "../types/community";
+import axios from "axios";
+import { useQuery } from "@tanstack/react-query";
 
-interface IProps {
-  communities: CommunityType[];
-}
-
-const Navbar = ({ communities }: IProps) => {
+const Navbar = () => {
   const { data: session } = useSession();
   const router = useRouter();
   const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
+  const { data: communities } = useQuery<CommunityType[]>(["communities"], () =>
+    axios.get("/api/community").then((res) => res.data)
+  );
 
   const handleSearch = (event: any) => {
     event.preventDefault();
@@ -28,13 +29,12 @@ const Navbar = ({ communities }: IProps) => {
   };
 
   const PageName = () => {
-    if (router.query.community) return <span>r/{router.query.community}</span>;
-    else if (router.pathname === "/saved") return <span>Saved Posts</span>;
-    else if (router.pathname === "/create-post")
-      return <span>Create Post</span>;
+    if (router.query.community) return <>r/{router.query.community}</>;
+    else if (router.pathname === "/saved") return <>Saved Posts</>;
+    else if (router.pathname === "/create-post") return <>Create Post</>;
     else if (router.pathname === "/create-community")
-      return <span>Create Community</span>;
-    else return <span>Home</span>;
+      return <>Create Community</>;
+    else return <>Home</>;
   };
 
   return (

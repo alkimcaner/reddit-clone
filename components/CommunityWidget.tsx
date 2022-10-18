@@ -18,14 +18,14 @@ const CommunityWidget = ({ community }: IProps) => {
   const handleDeleteCommunity = async () => {
     try {
       if (!session || community?.uid !== session?.user?.uid) return;
-      await axios.delete(encodeURI(`/api/community?_id=${community._id}`));
+      await axios.delete(`/api/community?_id=${community._id}`);
       router.push("/");
     } catch (error: any) {
       console.log(error);
     }
   };
 
-  useEffect(() => setCommunityCreatedAt(community.createdAt), [community]);
+  useEffect(() => setCommunityCreatedAt(community?.createdAt), [community]);
 
   return (
     <div className="flex flex-col justify-center gap-4 bg-neutral-900 border border-neutral-700 rounded-md h-fit px-2 py-4">
@@ -40,7 +40,7 @@ const CommunityWidget = ({ community }: IProps) => {
         <h2 className="font-semibold text-neutral-500">About Community</h2>
         <p className="py-2">{community?.about}</p>
       </div>
-      {session?.user?.uid === community.uid && (
+      {session?.user?.uid === community?.uid && (
         <button
           onClick={handleDeleteCommunity}
           className="bg-red-500 hover:bg-red-600 text-neutral-200 font-bold rounded-full py-1 text-center"

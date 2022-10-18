@@ -1,4 +1,4 @@
-import React, { MouseEvent, useEffect, useRef, useState } from "react";
+import React, { MouseEvent, useRef, useState } from "react";
 import Head from "next/head";
 import Navbar from "../components/Navbar";
 import { NextPage } from "next";
@@ -8,58 +8,33 @@ import useClickOutside from "../hooks/useClickOutside";
 import axios from "axios";
 import { CommunityType } from "../types/community";
 import HomeWidget from "../components/HomeWidget";
-import { unstable_getServerSession } from "next-auth";
-import { authOptions } from "./api/auth/[...nextauth]";
+import { useQuery } from "@tanstack/react-query";
 
-export const getServerSideProps = async (ctx: any) => {
-  //Redirect to homepage if not logged in
-  const session = await unstable_getServerSession(
-    ctx.req,
-    ctx.res,
-    authOptions
-  );
-  if (!session) return { redirect: { destination: "/" } };
-
-  try {
-    const communitiesRes = await axios.get(
-      `${process.env.NEXTAUTH_URL}api/community`
-    );
-
-    return {
-      props: { communities: communitiesRes.data },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {} };
-  }
-};
-
-interface IProps {
-  communities: CommunityType[];
-}
-
-const CreatePost: NextPage<IProps> = ({ communities }) => {
+const CreatePost: NextPage = () => {
   const router = useRouter();
   const [isCommunityMenuOpen, setIsCommunityMenuOpen] = useState(false);
   const [community, setCommunity] = useState<string>();
-  const titleRef = useRef<HTMLInputElement>(null);
-  const textRef = useRef<HTMLTextAreaElement>(null);
+  const [title, setTitle] = useState("");
+  const [content, setContent] = useState("");
   const menuRef = useClickOutside(() => setIsCommunityMenuOpen(false));
-  const [buttonDisabled, setButtonDisabled] = useState(false);
+  const { data: communities } = useQuery<CommunityType[]>(["communities"], () =>
+    axios.get("/api/community").then((res) => res.data)
+  );
 
   const handleCreatePost = async (event: MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    if (!titleRef.current?.value || !textRef.current?.value || !community) {
+    if (!title || !content || !community) {
       alert("Please fill in the blanks");
       return;
     }
-    setButtonDisabled(true);
+    setTitle("");
+    setContent("");
 
     try {
       const response = await axios.post("api/post", {
         community,
-        title: titleRef.current.value,
-        content: textRef.current.value,
+        title,
+        content,
       });
       router.push(`/r/${community}/${response.data._id}`);
     } catch (error) {
@@ -75,7 +50,7 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
@@ -108,7 +83,8 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
           <div className="bg-neutral-900 rounded-md flex flex-col gap-4 p-4">
             <div className="border border-neutral-700 rounded-md w-full">
               <input
-                ref={titleRef}
+                value={title}
+                onChange={(event) => setTitle(event.target.value)}
                 type="text"
                 placeholder="Title"
                 className="bg-transparent p-2 w-full"
@@ -116,14 +92,14 @@ const CreatePost: NextPage<IProps> = ({ communities }) => {
             </div>
             <div className="border border-neutral-700 rounded-md w-full">
               <textarea
-                ref={textRef}
+                value={content}
+                onChange={(event) => setContent(event.target.value)}
                 placeholder="Text"
                 className="bg-transparent p-2 w-full min-h-[8rem]"
               />
             </div>
             <div className="flex justify-end">
               <button
-                disabled={buttonDisabled}
                 onClick={handleCreatePost}
                 className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"
               >

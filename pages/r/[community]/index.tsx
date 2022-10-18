@@ -9,44 +9,28 @@ import Post from "../../../components/Post";
 import { CommunityType } from "../../../types/community";
 import { PostType } from "../../../types/post";
 import subredditLogo from "../../../public/assets/subredditLogo.png";
+import { useQuery } from "@tanstack/react-query";
+import { useRouter } from "next/router";
 
-export const getServerSideProps = async (ctx: any) => {
-  try {
-    const [postsRes, communitiesRes] = await Promise.all([
-      axios.get(
-        encodeURI(
-          `${process.env.NEXTAUTH_URL}api/post?community=${ctx.query?.community}`
-        )
-      ),
-      await axios.get(`${process.env.NEXTAUTH_URL}api/community`),
-    ]);
+const Community: NextPage = () => {
+  const router = useRouter();
 
-    const community = communitiesRes.data.find(
-      (x: any) => x.name === ctx.query?.community
-    );
+  const { data: posts, isLoading } = useQuery<PostType[]>(
+    ["posts", router.query.community],
+    () =>
+      axios
+        .get(`/api/post?community=${router.query.community}`)
+        .then((res) => res.data)
+  );
 
-    if (!community) return { redirect: { destination: "/" } };
+  const { data: community } = useQuery<CommunityType>(
+    ["community", router.query.community],
+    () =>
+      axios
+        .get(`/api/community?name=${router.query.community}`)
+        .then((res) => res.data[0])
+  );
 
-    return {
-      props: {
-        posts: postsRes.data,
-        communities: communitiesRes.data,
-        community,
-      },
-    };
-  } catch (error) {
-    console.log(error);
-    return { props: {}, redirect: { destination: "/" } };
-  }
-};
-
-interface IProps {
-  communities: CommunityType[];
-  community: CommunityType;
-  posts: PostType[];
-}
-
-const Community: NextPage<IProps> = ({ posts, communities, community }) => {
   return (
     <div className="bg-black text-neutral-300 min-h-screen">
       <Head>
@@ -55,25 +39,36 @@ const Community: NextPage<IProps> = ({ posts, communities, community }) => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
 
-      <Navbar communities={communities} />
+      <Navbar />
 
-      <div className="bg-neutral-900 p-4">
-        <div className="max-w-5xl mx-auto flex gap-4 items-center">
-          <div className="w-12 h-12 relative">
-            <Image src={subredditLogo} layout="fill" alt="" />
-          </div>
-          <div>
-            <h1 className="text-3xl font-bold">
-              {community.name[0].toUpperCase() + community.name.substring(1)}
-            </h1>
-            <h1 className="text-neutral-500">r/{community.name}</h1>
+      {community && (
+        <div className="bg-neutral-900 p-4">
+          <div className="max-w-5xl mx-auto flex gap-4 items-center">
+            <div className="w-12 h-12 relative">
+              <Image src={subredditLogo} layout="fill" alt="" />
+            </div>
+            <div>
+              <h1 className="text-3xl font-bold">
+                {community.name[0].toUpperCase() + community.name.substring(1)}
+              </h1>
+              <h1 className="text-neutral-500">r/{community.name}</h1>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {posts.length ? (
+          {isLoading && (
+            <Image
+              src="/assets/loading.svg"
+              alt="loading"
+              width={64}
+              height={64}
+              priority
+            />
+          )}
+          {posts?.length ? (
             posts?.map((post) => <Post key={post._id} post={post} />)
           ) : (
             <p className="text-neutral-500 text-lg text-center mb-4">
