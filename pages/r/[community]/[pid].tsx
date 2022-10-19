@@ -93,7 +93,6 @@ const Community: NextPage = () => {
                   onClick={() => {
                     if (!session) return;
                     if (!content) return alert("Please write a comment");
-
                     commentMutation.mutate();
                   }}
                   className="bg-gray-100 hover:bg-gray-300 py-1 px-4 rounded-full text-black font-semibold"

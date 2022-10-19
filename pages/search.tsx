@@ -2,18 +2,16 @@ import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import type { NextPage } from "next";
 import Head from "next/head";
-import Image from "next/image";
 import { useRouter } from "next/router";
+import Feed from "../components/Feed";
 import HomeWidget from "../components/HomeWidget";
 import Navbar from "../components/Navbar";
-import Post from "../components/Post";
 import { PostType } from "../types/post";
 
 const Home: NextPage = () => {
   const router = useRouter();
-  const { data: posts, isLoading } = useQuery<PostType[]>(
-    ["posts", router.query.q],
-    () => axios.get(`/api/post?q=${router.query.q}`).then((res) => res.data)
+  const postQuery = useQuery<PostType[]>(["posts", router.query.q], () =>
+    axios.get(`/api/post?q=${router.query.q}`).then((res) => res.data)
   );
 
   return (
@@ -28,22 +26,7 @@ const Home: NextPage = () => {
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {isLoading && (
-            <Image
-              src="/assets/loading.svg"
-              alt="loading"
-              width={64}
-              height={64}
-              priority
-            />
-          )}
-          {posts?.length ? (
-            posts?.map((post) => <Post key={post._id} post={post} />)
-          ) : (
-            <p className="text-neutral-500 text-lg text-center mb-4">
-              There are no posts
-            </p>
-          )}
+          <Feed postQuery={postQuery} />
         </section>
         <section>
           <HomeWidget />

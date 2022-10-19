@@ -5,17 +5,17 @@ import Image from "next/image";
 import React from "react";
 import CommunityWidget from "../../../components/CommunityWidget";
 import Navbar from "../../../components/Navbar";
-import Post from "../../../components/Post";
 import { CommunityType } from "../../../types/community";
 import { PostType } from "../../../types/post";
 import subredditLogo from "../../../public/assets/subredditLogo.png";
 import { useQuery } from "@tanstack/react-query";
 import { useRouter } from "next/router";
+import Feed from "../../../components/Feed";
 
 const Community: NextPage = () => {
   const router = useRouter();
 
-  const { data: posts, isLoading } = useQuery<PostType[]>(
+  const postQuery = useQuery<PostType[]>(
     ["posts", router.query.community],
     () =>
       axios
@@ -59,22 +59,7 @@ const Community: NextPage = () => {
 
       <main className="max-w-5xl mx-auto p-4 grid grid-cols-3 gap-4">
         <section className="flex flex-col gap-4 col-span-3 lg:col-span-2">
-          {isLoading && (
-            <Image
-              src="/assets/loading.svg"
-              alt="loading"
-              width={64}
-              height={64}
-              priority
-            />
-          )}
-          {posts?.length ? (
-            posts?.map((post) => <Post key={post._id} post={post} />)
-          ) : (
-            <p className="text-neutral-500 text-lg text-center mb-4">
-              There are no posts
-            </p>
-          )}
+          <Feed postQuery={postQuery} />
         </section>
         <section className="row-start-1 lg:row-start-auto col-span-3 lg:col-span-1">
           {community && <CommunityWidget community={community} />}
