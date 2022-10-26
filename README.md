@@ -27,7 +27,7 @@ npm install
 yarn install
 ```
 
-### Start dev server
+### Start Next.js in development mode
 
 ```bash
 npm run dev
@@ -35,7 +35,7 @@ npm run dev
 yarn dev
 ```
 
-### Build for production
+### Build the application for production
 
 ```bash
 npm run build
@@ -43,7 +43,7 @@ npm run build
 yarn build
 ```
 
-### Start Node.js server
+### Start a Next.js production server
 
 ```bash
 npm run start
