@@ -1,6 +1,6 @@
 # Reddit Clone
 
-[Live demo](https://reddit-clone-flawn.vercel.app/)
+[Live demo](https://reddit-clone.alkimcaner.com/)
 
 Built with:
 
@@ -15,7 +15,7 @@ Built with:
 
 ## Screenshot
 
-![gif](https://github.com/fl4wn/portfolio/blob/main/public/assets/projects/reddit_banner.jpg)
+![gif](https://github.com/alkimcaner/portfolio/blob/main/public/assets/reddit.jpg)
 
 ## Project Setup
 
