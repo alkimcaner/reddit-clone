@@ -1,6 +1,6 @@
 # Reddit Clone
 
-[Live demo](https://reddit-clone.alkimcaner.com/)
+[Live demo](https://reddit-clone-flawn.vercel.app/)
 
 Built with:
 
