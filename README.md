@@ -1,13 +1,13 @@
 # Reddit Clone
 
-[Live demo](https://reddit-clone-flawn.vercel.app/)
+[Live demo](https://reddit-clone-alkimcaner.vercel.app/)
 
 Built with:
 
 - Next.js
 - NextAuth.js
 - React
-- React Query
+- TanStack Query
 - Typescript
 - MongoDB
 - Mongoose
