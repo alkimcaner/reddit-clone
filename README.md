@@ -22,23 +22,23 @@ Built with:
 ### Install dependencies
 
 ```bash
-yarn install
+npm install
 ```
 
 ### Start Next.js in development mode
 
 ```bash
-yarn dev
+npm run dev
 ```
 
 ### Build the application for production
 
 ```bash
-yarn build
+npm run build
 ```
 
 ### Start a Next.js production server
 
 ```bash
-yarn start
+npm run start
 ```
